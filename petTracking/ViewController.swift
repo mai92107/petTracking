@@ -135,9 +135,11 @@ extension TrackingVC: CLLocationManagerDelegate {
         }
             
         // 🔥 取得原始經緯度 (含正負號)
-        let longitude = String(format: "%.7f", location.coordinate.longitude)
-        let latitude = String(format: "%.7f", location.coordinate.latitude)
-        
+        let lng = String(format: "%.7f", location.coordinate.longitude)
+        let lat = String(format: "%.7f", location.coordinate.latitude)
+        let longitude = Double(lng)!
+        let latitude = Double(lat)!
+
         // 更新顯示
         updateLocation(lng: longitude, lat: latitude)
         // 發送數據
@@ -153,23 +155,22 @@ extension TrackingVC: CLLocationManagerDelegate {
         }
     }
     
-    func updateLocation(lng: String, lat: String) {
+    func updateLocation(lng: Double, lat: Double) {
         // 處理顯示用的經度
-        let longitude = Double(lng)!
-        let longitudeAbs = abs(longitude)
-        let longitudeDirection = longitude >= 0 ? "東經" : "西經"
+       
+        let longitudeAbs = abs(lng)
+        let longitudeDirection = lng >= 0 ? "東經" : "西經"
         
         // 處理顯示用的緯度
-        let latitude = Double(lat)!
-        let latitudeAbs = abs(latitude)
-        let latitudeDirection = latitude >= 0 ? "北緯" : "南緯"
+        let latitudeAbs = abs(lat)
+        let latitudeDirection = lat >= 0 ? "北緯" : "南緯"
         
         // 顯示經緯度
         longitudeLabel.text = "\(longitudeDirection): \(longitudeAbs)°"
         latitudeLabel.text = "\(latitudeDirection): \(latitudeAbs)°"
     }
     
-    func sendData(longitude: String, latitude: String){
+    func sendData(longitude: Double, latitude: Double){
         // 🔥 修正: 使用 shared 單例 + 實際的 JWT
         if let jwt = AuthManager.shared.getJWT() {
             MQTTUtils.shared.publishLocation(
@@ -178,12 +179,6 @@ extension TrackingVC: CLLocationManagerDelegate {
                 jwt: jwt
             )
         } else {
-            // 🔥 如果沒有 JWT,使用測試 token 或顯示警告
-            MQTTUtils.shared.publishLocation(
-                latitude: latitude,
-                longitude: longitude,
-                jwt: "test_token"  // 或者不發送
-            )
             mqttStatusLabel.text = "MQTT: 無 JWT"
             mqttStatusLabel.textColor = .systemOrange
             print("⚠️ 無 JWT Token,請先登入")

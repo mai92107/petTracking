@@ -15,14 +15,18 @@ class MQTTUtils{
     private init() {}  // 🔥 防止外部建立實例
     
     // 發布位置資料
-    func publishLocation(latitude: String, longitude: String, jwt: String) {
-
+    func publishLocation(latitude: Double, longitude: Double, jwt: String) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.timeZone = TimeZone.current
+        
         // 建立 JSON 資料
-        let locationData: [String: String] = [
+        let locationData: [String: Any] = [
             "lat": latitude,
             "lng": longitude,
             "deviceId": MQTTConfig.deviceId,
-            "subscribeTo":MQTTConfig.deviceUuid
+            "subscribeTo":MQTTConfig.deviceUuid,
+            "recordAt": formatter.string(from: Date())
         ]
         
         let ip: String = NetworkUtils.getIPAddress() ?? ""
@@ -32,7 +36,7 @@ class MQTTUtils{
            let jsonString = String(data: jsonData, encoding: .utf8) {
             
             // 發布到 topic
-            let topic = "req/device_recording/\(jwt)/\(ip)"
+            let topic = "req/device_recording/\(jwt)/\(MQTTConfig.clientID)/\(ip)"
             publish(data: jsonString, to: topic)
         }
     }

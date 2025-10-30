@@ -15,10 +15,10 @@ class MQTTUtils{
     private init() {}  // 🔥 防止外部建立實例
     
     // 發布位置資料
-    func publishLocation(latitude: Double, longitude: Double, jwt: String) {
+    func publishLocation(latitude: String, longitude: String, jwt: String) {
 
         // 建立 JSON 資料
-        let locationData: [String: Any] = [
+        let locationData: [String: String] = [
             "lat": latitude,
             "lng": longitude,
             "deviceId": MQTTConfig.deviceId,

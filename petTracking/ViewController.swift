@@ -71,7 +71,7 @@ class TrackingVC: UIViewController {
     @objc func mqttStatusChanged(_ notification: Notification) {
         if let isConnected = notification.userInfo?["isConnected"] as? Bool {
             mqttStatusLabel.text = isConnected ? "MQTT: 已連線 ✓" : "MQTT: 未連線"
-            mqttStatusLabel.textColor = isConnected ? .systemGreen : .systemRed
+            mqttStatusLabel.textColor = isConnected ? .ptSecondary : .ptTertiary
         }
     }
     
@@ -113,6 +113,12 @@ class TrackingVC: UIViewController {
         locationManager.stopUpdatingLocation()
     }
 
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("定位失敗: \(error.localizedDescription)")
+        mqttStatusLabel.text = "定位失敗"
+        mqttStatusLabel.textColor = .systemRed
+    }
 }
 
 // MARK: - CLLocationManagerDelegate
@@ -129,16 +135,16 @@ extension TrackingVC: CLLocationManagerDelegate {
         }
             
         // 🔥 取得原始經緯度 (含正負號)
-        let longitude = location.coordinate.longitude
-        let latitude = location.coordinate.latitude
+        let longitude = String(format: "%.7f", location.coordinate.longitude)
+        let latitude = String(format: "%.7f", location.coordinate.latitude)
         
-        updateLocation(longitude: longitude, latitude: latitude)
+        // 更新顯示
+        updateLocation(lng: longitude, lat: latitude)
+        // 發送數據
         sendData(longitude: longitude, latitude: latitude)
-        
         // 取得定位後停止更新,節省電量
         locationManager.stopUpdatingLocation()
     }
-    
     func checkLoginStatus(){
         // 🔥 測試用 JWT (實際應該從登入畫面取得)
         if !AuthManager.shared.isLoggedIn() {
@@ -146,30 +152,24 @@ extension TrackingVC: CLLocationManagerDelegate {
             print("🧪 已設定測試 JWT")
         }
     }
-
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("定位失敗: \(error.localizedDescription)")
-        mqttStatusLabel.text = "定位失敗"
-        mqttStatusLabel.textColor = .systemRed
-    }
     
-    func updateLocation(longitude: CGFloat, latitude: CGFloat){
+    func updateLocation(lng: String, lat: String) {
         // 處理顯示用的經度
+        let longitude = Double(lng)!
         let longitudeAbs = abs(longitude)
         let longitudeDirection = longitude >= 0 ? "東經" : "西經"
-        let longitudeString = String(format: "%.5f", longitudeAbs)
         
         // 處理顯示用的緯度
+        let latitude = Double(lat)!
         let latitudeAbs = abs(latitude)
         let latitudeDirection = latitude >= 0 ? "北緯" : "南緯"
-        let latitudeString = String(format: "%.5f", latitudeAbs)
         
         // 顯示經緯度
-        longitudeLabel.text = "\(longitudeDirection): \(longitudeString)°"
-        latitudeLabel.text = "\(latitudeDirection): \(latitudeString)°"
+        longitudeLabel.text = "\(longitudeDirection): \(longitudeAbs)°"
+        latitudeLabel.text = "\(latitudeDirection): \(latitudeAbs)°"
     }
     
-    func sendData(longitude: CGFloat, latitude: CGFloat){
+    func sendData(longitude: String, latitude: String){
         // 🔥 修正: 使用 shared 單例 + 實際的 JWT
         if let jwt = AuthManager.shared.getJWT() {
             MQTTUtils.shared.publishLocation(
@@ -177,8 +177,6 @@ extension TrackingVC: CLLocationManagerDelegate {
                 longitude: longitude,
                 jwt: jwt
             )
-            mqttStatusLabel.text = "MQTT: 已發送 ✓"
-            mqttStatusLabel.textColor = .systemGreen
         } else {
             // 🔥 如果沒有 JWT,使用測試 token 或顯示警告
             MQTTUtils.shared.publishLocation(

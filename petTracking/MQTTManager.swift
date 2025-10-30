@@ -12,7 +12,7 @@ class MQTTManager {
     static let shared = MQTTManager()
     
     public var mqttClient: CocoaMQTT?
-    private let clientID = "iOS_PetTracker_\(ProcessInfo().globallyUniqueString)"
+    private let clientID = MQTTConfig.clientID
     
     private init() {}
     

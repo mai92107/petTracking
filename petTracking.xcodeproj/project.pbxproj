@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4E1B885247C38F26A5AAA672 /* Pods_petTracking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A023DAE0C071298F518ABF6 /* Pods_petTracking.framework */; };
+		58B7C00D2EB2FDD30094468A /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 58B7C00C2EB2FDC30094468A /* Podfile */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		E1F8D25E2EA907FD008CE84F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +29,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		58B7C00C2EB2FDC30094468A /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
+		5A023DAE0C071298F518ABF6 /* Pods_petTracking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_petTracking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD995E18CF9F3E9E11A5D829 /* Pods-petTracking.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-petTracking.release.xcconfig"; path = "Target Support Files/Pods-petTracking/Pods-petTracking.release.xcconfig"; sourceTree = "<group>"; };
+		E19749207ADDF9ABA8AA0BC7 /* Pods-petTracking.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-petTracking.debug.xcconfig"; path = "Target Support Files/Pods-petTracking/Pods-petTracking.debug.xcconfig"; sourceTree = "<group>"; };
 		E1F8D2472EA907FA008CE84F /* petTracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = petTracking.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1F8D25D2EA907FD008CE84F /* petTrackingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = petTrackingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1F8D2672EA907FD008CE84F /* petTrackingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = petTrackingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -50,11 +59,15 @@
 		};
 		E1F8D2602EA907FD008CE84F /* petTrackingTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = petTrackingTests;
 			sourceTree = "<group>";
 		};
 		E1F8D26A2EA907FD008CE84F /* petTrackingUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = petTrackingUITests;
 			sourceTree = "<group>";
 		};
@@ -65,6 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E1B885247C38F26A5AAA672 /* Pods_petTracking.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +99,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		329A3D5D2EF19063FEF447F7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5A023DAE0C071298F518ABF6 /* Pods_petTracking.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B1E30BD843FCE9CD07BB13DA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E19749207ADDF9ABA8AA0BC7 /* Pods-petTracking.debug.xcconfig */,
+				BD995E18CF9F3E9E11A5D829 /* Pods-petTracking.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		E1F8D23E2EA907FA008CE84F = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +123,9 @@
 				E1F8D2602EA907FD008CE84F /* petTrackingTests */,
 				E1F8D26A2EA907FD008CE84F /* petTrackingUITests */,
 				E1F8D2482EA907FA008CE84F /* Products */,
+				58B7C00C2EB2FDC30094468A /* Podfile */,
+				B1E30BD843FCE9CD07BB13DA /* Pods */,
+				329A3D5D2EF19063FEF447F7 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -112,9 +146,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E1F8D2702EA907FD008CE84F /* Build configuration list for PBXNativeTarget "petTracking" */;
 			buildPhases = (
+				B23BDCAB39DFD7C534B58B8B /* [CP] Check Pods Manifest.lock */,
 				E1F8D2432EA907FA008CE84F /* Sources */,
 				E1F8D2442EA907FA008CE84F /* Frameworks */,
 				E1F8D2452EA907FA008CE84F /* Resources */,
+				5B529643FFE62BA90F66E7A7 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -124,8 +160,6 @@
 				E1F8D2492EA907FA008CE84F /* petTracking */,
 			);
 			name = petTracking;
-			packageProductDependencies = (
-			);
 			productName = petTracking;
 			productReference = E1F8D2472EA907FA008CE84F /* petTracking.app */;
 			productType = "com.apple.product-type.application";
@@ -147,8 +181,6 @@
 				E1F8D2602EA907FD008CE84F /* petTrackingTests */,
 			);
 			name = petTrackingTests;
-			packageProductDependencies = (
-			);
 			productName = petTrackingTests;
 			productReference = E1F8D25D2EA907FD008CE84F /* petTrackingTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -170,8 +202,6 @@
 				E1F8D26A2EA907FD008CE84F /* petTrackingUITests */,
 			);
 			name = petTrackingUITests;
-			packageProductDependencies = (
-			);
 			productName = petTrackingUITests;
 			productReference = E1F8D2672EA907FD008CE84F /* petTrackingUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -225,6 +255,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				58B7C00D2EB2FDD30094468A /* Podfile in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,6 +274,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5B529643FFE62BA90F66E7A7 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-petTracking/Pods-petTracking-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-petTracking/Pods-petTracking-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-petTracking/Pods-petTracking-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B23BDCAB39DFD7C534B58B8B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-petTracking-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E1F8D2432EA907FA008CE84F /* Sources */ = {
@@ -284,12 +357,14 @@
 /* Begin XCBuildConfiguration section */
 		E1F8D2712EA907FD008CE84F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E19749207ADDF9ABA8AA0BC7 /* Pods-petTracking.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GG9SNK5Y77;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = petTracking/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -312,12 +387,14 @@
 		};
 		E1F8D2722EA907FD008CE84F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BD995E18CF9F3E9E11A5D829 /* Pods-petTracking.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GG9SNK5Y77;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = petTracking/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

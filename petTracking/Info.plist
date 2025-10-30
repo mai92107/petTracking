@@ -6,6 +6,10 @@
 	<string>App 需要使用您的位置來顯示經緯度</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>App 需要使用您的位置來顯示經緯度</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

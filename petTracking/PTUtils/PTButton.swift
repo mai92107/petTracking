@@ -13,8 +13,8 @@ class PTButton: UIButton {
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false
         
-        let bgColor: UIColor = .white
-        let textColor: UIColor = .black
+        let bgColor: UIColor = .ptPrimary
+        let textColor: UIColor = .ptQuinary
         
         let pdTop: CGFloat = 10
         let pdLeft: CGFloat = 30

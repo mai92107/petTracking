@@ -8,14 +8,14 @@
 import UIKit
 
 class PTHorizontalStackView: UIStackView {
-
-    init(views: [UIView]) {
+    
+    init(in padding: CGFloat, views: [UIView]) {
         super.init(frame: .zero)
         
         self.axis = .horizontal
         self.alignment = .center
         self.distribution = .equalSpacing
-        self.spacing = 20
+        self.spacing = padding
         self.translatesAutoresizingMaskIntoConstraints = false
         
         views.forEach{ self.addArrangedSubview($0) }
@@ -28,12 +28,12 @@ class PTHorizontalStackView: UIStackView {
 
 class PTVerticalStackView: UIStackView {
 
-    init(views: [UIView]) {
+    init(in padding: CGFloat, views: [UIView]) {
         super.init(frame: .zero)
         
         self.axis = .vertical
         self.alignment = .center
-        self.spacing = 50
+        self.spacing = padding
         self.translatesAutoresizingMaskIntoConstraints = false
         views.forEach{ self.addArrangedSubview($0) }
     }

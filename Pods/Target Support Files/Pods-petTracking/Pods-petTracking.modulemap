@@ -1,0 +1,6 @@
+framework module Pods_petTracking {
+  umbrella header "Pods-petTracking-umbrella.h"
+
+  export *
+  module * { export * }
+}

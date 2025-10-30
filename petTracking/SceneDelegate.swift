@@ -17,7 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        let rootVC = ViewController()
+        let rootVC = TrackingVC()
         
         let navController = UINavigationController(rootViewController: rootVC)
         

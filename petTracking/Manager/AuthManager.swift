@@ -9,11 +9,10 @@ import Foundation
 
 class AuthManager {
     static let shared = AuthManager()
-    
-    private let jwtKey = "userJWT"
-    
     private init() {}
     
+    private let jwtKey = UserConfig.jwtKey
+        
     // 儲存 JWT
     func saveJWT(_ token: String) {
         UserDefaults.standard.set(token, forKey: jwtKey)

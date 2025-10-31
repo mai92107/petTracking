@@ -24,8 +24,8 @@ class MQTTUtils{
         let locationData: [String: Any] = [
             "lat": latitude,
             "lng": longitude,
-            "deviceId": MQTTConfig.deviceId,
-            "subscribeTo":MQTTConfig.deviceUuid,
+            "deviceId": DeviceConfig.deviceId,
+            "subscribeTo":DeviceConfig.deviceUuid,
             "recordAt": formatter.string(from: Date())
         ]
         

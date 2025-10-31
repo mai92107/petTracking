@@ -45,5 +45,22 @@ class PTLabel: UILabel {
         
     }
     
+    func resetLabel(text: String, with style: PTLabelStyle){
+        self.text = text
+
+        // 風格
+        switch style{
+            case .title:
+            self.textColor = .label
+            self.font = .systemFont(ofSize: 32, weight: .bold)
+            break
+            
+            case .subtitle:
+            self.textColor = .secondaryLabel
+            self.font = .systemFont(ofSize: 28, weight: .medium)
+            break
+        }
+    }
+    
     
 }

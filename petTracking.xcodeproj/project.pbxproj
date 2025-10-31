@@ -59,15 +59,11 @@
 		};
 		E1F8D2602EA907FD008CE84F /* petTrackingTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = petTrackingTests;
 			sourceTree = "<group>";
 		};
 		E1F8D26A2EA907FD008CE84F /* petTrackingUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = petTrackingUITests;
 			sourceTree = "<group>";
 		};
@@ -284,9 +280,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-petTracking/Pods-petTracking-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-petTracking/Pods-petTracking-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleIdentifier</key>
+	<string></string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -10,9 +12,11 @@
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>需要存取本地網路以進行定位服務</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>App 需要使用您的位置來顯示經緯度</string>
+	<string>App 需要在使用時存取您的位置以追蹤寵物。</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>App 需要使用您的位置來顯示經緯度</string>
+	<string>App 需要在使用時存取您的位置以追蹤寵物。</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>App 需要在使用時存取您的位置以追蹤寵物。</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

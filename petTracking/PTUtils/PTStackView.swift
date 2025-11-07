@@ -13,7 +13,7 @@ class PTHorizontalStackView: UIStackView {
         super.init(frame: .zero)
         
         self.axis = .horizontal
-        self.alignment = .center
+        self.alignment = .fill
         self.distribution = .equalSpacing
         self.spacing = padding
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -32,7 +32,7 @@ class PTVerticalStackView: UIStackView {
         super.init(frame: .zero)
         
         self.axis = .vertical
-        self.alignment = .center
+        self.alignment = .fill
         self.spacing = padding
         self.translatesAutoresizingMaskIntoConstraints = false
         views.forEach{ self.addArrangedSubview($0) }

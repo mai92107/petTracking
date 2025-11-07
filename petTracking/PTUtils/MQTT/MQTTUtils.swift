@@ -47,7 +47,7 @@ class MQTTUtils{
             return
         }
         
-        client.publish(topic, withString: data, qos: .qos1)
+        client.publish(topic, withString: data, qos: MQTTConfig.qos)
         
         print("📤 已發送, 主題: \(topic), 內容: \(data)")
     }

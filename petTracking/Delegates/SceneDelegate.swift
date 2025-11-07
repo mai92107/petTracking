@@ -17,13 +17,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        let rootVC = TrackingVC()
+//        let trackingVC = TrackingVC()
+//        let loginVC = LoginVC()
+        let registerVC = RegisterVC()
         
-        let navController = UINavigationController(rootViewController: rootVC)
+        let navController = UINavigationController(rootViewController: registerVC)
         
         window.rootViewController = navController
         self.window = window
         window.makeKeyAndVisible()
+        
         print("✅ Scene 初始化完成，畫面顯示中！")
 
     }

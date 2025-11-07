@@ -10,6 +10,7 @@ import UIKit
 enum PTLabelStyle {
     case title
     case subtitle
+    case memo
 }
 
 class PTLabel: UILabel {
@@ -37,6 +38,11 @@ class PTLabel: UILabel {
             self.textColor = .secondaryLabel
             self.font = .systemFont(ofSize: 28, weight: .medium)
             break
+            
+            case .memo:
+            self.textColor = .secondaryLabel
+            self.font = .systemFont(ofSize: 15, weight: .semibold)
+            break
         }
         
     }
@@ -58,6 +64,11 @@ class PTLabel: UILabel {
             case .subtitle:
             self.textColor = .secondaryLabel
             self.font = .systemFont(ofSize: 28, weight: .medium)
+            break
+            
+            case .memo:
+            self.textColor = .secondaryLabel
+            self.font = .systemFont(ofSize: 15, weight: .semibold)
             break
         }
     }

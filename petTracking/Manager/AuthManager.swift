@@ -5,7 +5,7 @@
 //  Created by Rafael Mai on 2025/10/30.
 //
 
-import Foundation
+import UIKit
 
 class AuthManager {
     static let shared = AuthManager()

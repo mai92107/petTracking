@@ -62,10 +62,10 @@ class NetworkMonitor {
         
         if wasConnected && !isConnected {
             print("⚠️ 網路已斷線")
-            handleNetworkLost()
+//            handleNetworkLost()
         } else if !wasConnected && isConnected {
             print("✅ 網路已連線")
-            handleNetworkRestored()
+//            handleNetworkRestored()
         }
     }
 
@@ -78,20 +78,20 @@ class NetworkMonitor {
             )
         }
     }
-    
-    private func handleNetworkLost() {
-        // 網路斷線時的處理
-        DispatchQueue.main.async {
-            // 通知 MQTT 斷線
-            MQTTManager.shared.handleNetworkLost()
-        }
-    }
-    
-    private func handleNetworkRestored() {
-        // 網路恢復時的處理
-        DispatchQueue.main.async {
-            // 嘗試重新連線 MQTT
-            MQTTManager.shared.handleNetworkRestored()
-        }
-    }
+//    
+//    private func handleNetworkLost() {
+//        // 網路斷線時的處理
+//        DispatchQueue.main.async {
+//            // 通知 MQTT 斷線
+//            MQTTManager.shared.handleNetworkLost()
+//        }
+//    }
+//    
+//    private func handleNetworkRestored() {
+//        // 網路恢復時的處理
+//        DispatchQueue.main.async {
+//            // 嘗試重新連線 MQTT
+//            MQTTManager.shared.handleNetworkRestored()
+//        }
+//    }
 }

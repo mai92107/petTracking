@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol PtButtonDelegate: AnyObject {
+    func onClick()
+}
+
 class PTButton: UIButton {
+    
+    weak var ptDelegate: PtButtonDelegate?
 
     init(title: String) {
         super.init(frame: .zero)
@@ -34,7 +40,7 @@ class PTButton: UIButton {
             // 字體大小與粗體
             config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
                 var outgoing = incoming
-                outgoing.font = UIFont.systemFont(ofSize: 30, weight: .bold)
+                outgoing.font = UIFont.systemFont(ofSize: 20, weight: .bold)
                 return outgoing
             }
 
@@ -45,16 +51,22 @@ class PTButton: UIButton {
             setTitleColor(textColor, for: .normal)
 
             // 字體大小與粗體
-            titleLabel?.font = UIFont.systemFont(ofSize: 30, weight: .bold)
+            titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .bold)
 
             layer.cornerRadius = 15
-
+            
             // padding
             contentEdgeInsets = UIEdgeInsets(top: pdTop, left: pdLeft, bottom: pdBottom, right: pdRight)
         }
+        addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
-
+    
+    @objc func buttonTapped(){
+        ptDelegate?.onClick()
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
+

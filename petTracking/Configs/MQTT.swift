@@ -22,7 +22,7 @@ struct MQTTConfig {
     static let autoReconnect = true
     
     // QoS 設定
-    static let qos: CocoaMQTTQoS = .qos1
+    static let qos: CocoaMQTTQoS = .qos0
     
     // Client ID 前綴
     static let clientID = "iOS_PetTracker"

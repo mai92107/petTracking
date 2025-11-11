@@ -8,10 +8,12 @@
 import Foundation
 
 enum Action: String {
-    case LOGIN = "login_account"
-    case REGISTER = "register_account"
+    case LOGIN = "account_login"
+    case REGISTER = "account_register"
+    case HELLO = "home_hello"
+    case SYSTEM_STATUS = "system_status"
     case DEVICE_STATUS = "device_status"
-    case resume = ""
+    case ADD_DEVICE = "member_addDevice"
 }
 extension MQTTUtils{
     
@@ -60,6 +62,6 @@ extension MQTTUtils{
         func printAll(_ message: String){
             print(message)
         }
-        MQTTUtils.shared.publishAndWaitResponse(data: data, publishTopic: topic, completion: printAll)
+        publishAndWaitResponse(data: data, publishTopic: topic, completion: printAll)
     }
 }

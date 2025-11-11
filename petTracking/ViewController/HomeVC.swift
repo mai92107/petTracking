@@ -56,7 +56,3 @@ extension HomeVC: PtButtonDelegate{
         }
     }
 }
-
-#Preview{
-    HomeVC()
-}

@@ -101,21 +101,51 @@ extension RegisterVC: UITextFieldDelegate{
 }
 extension RegisterVC: PtButtonDelegate{
     func onClick(_ sender: PTButton) {
-        let data: [String: String] = [
-            "usernameTextField": usernameTextField.text ?? "",
-            "emailTextField": emailTextField.text ?? "",
-            "passwordTextField": passwordTextField.text ?? "",
-            "firstnameTextField": firstnameTextField.text ?? "",
-            "lastnameTextField": lastnameTextField.text ?? "",
-            "nicknameTextField": nicknameTextField.text ?? ""
-        ]
-        func printAll(_ message: String){
-            print(message)
+        let username = usernameTextField.text
+        let email = emailTextField.text
+        let password = passwordTextField.text
+        let firstname = firstnameTextField.text
+        let lastname = lastnameTextField.text
+        let nickname = nicknameTextField.text
+        Task{ @MainActor in
+            let response = await MQTTUtils.shared.publishRegisterData(username: username!,
+                                                                   email: email!,
+                                                                   password: password!,
+                                                                   firstname: firstname ?? "",
+                                                                   lastname: lastname ?? "",
+                                                                   nickname: nickname!)
+            switch response {
+            case .success(let msg):
+                print("註冊成功: \(msg)")
+                navigateToHomeAuth()
+
+            case .failure(let errorMsg):
+                // 自動彈出後端錯誤訊息！
+                CommonAlertManager.showMessage(
+                    on: self,
+                    title: "註冊失敗",
+                    message: errorMsg
+                )
+
+            case .timeout:
+                CommonAlertManager.showMessage(
+                    on: self,
+                    title: "連線逾時",
+                    message: "請檢查網路後重試"
+                )
+            case .rawSuccess(let msg):
+                print("rawSuccess: " + msg)
+            }
         }
-        MQTTUtils.shared.publishAndWaitResponse(data: data, publishTopic: "req/123", completion: printAll)
+    }
+    
+    func navigateToHomeAuth(){
+        if let nav = navigationController {
+            nav.pushViewController(HomeVCAuth(), animated: true)
+        }
     }
 }
 
-#Preview {
-    RegisterVC()
-}
+//#Preview {
+//    RegisterVC()
+//}

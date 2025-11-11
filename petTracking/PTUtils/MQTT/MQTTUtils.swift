@@ -8,6 +8,14 @@
 import Foundation
 import CocoaMQTT
 
+
+enum MQTTResponse<T> {
+    case success(T)             // 正常回覆
+    case failure(String)        // 後端錯誤訊息
+    case timeout                // 逾時
+    case rawSuccess(String)
+}
+
 class MQTTUtils{
     
     static let shared = MQTTUtils()
@@ -25,29 +33,53 @@ class MQTTUtils{
         print("📤 已發送, 主題: \(topic), 內容: \(data)")
     }
     
-    func publishAndWaitResponse(
+    func publishAndWaitResponse<T: Decodable>(
           data: [String: String],
           publishTopic: String,
           qos: CocoaMQTTQoS = .qos1,
-          completion: @escaping (_ message: String) -> Void
+          completion: @escaping (MQTTResponse<T>) -> Void
       ) {
           guard let client = MQTTManager.shared.mqttClient, client.connState == .connected else {
               print("⚠️ MQTT 未連線，無法發送或訂閱")
               return
           }
           
-          // 加入接收主題
+          // 加入接收主題 及 錯誤訊息
           let subscribeTopic = UUID().uuidString
           
           var payload = data
           payload["subscribeTo"] = subscribeTopic
           
-          // 1️⃣ 訂閱回覆主題
-          client.subscribe(subscribeTopic, qos: qos)
-          print("📡 訂閱主題: \(subscribeTopic)")
+          // 1️⃣ 訂閱回覆主題, 增加錯誤回覆
+          let errTopic = "errReq/\(MQTTConfig.clientID)"
+          client.subscribe([(subscribeTopic, qos: qos),(errTopic, qos: qos)])
+          print("📡 訂閱主題: \(subscribeTopic),\(errTopic)")
 
           // 2️⃣ 設定臨時 delegate 監聽回覆
-          let responseDelegate = MQTTResponseDelegate(subscribeTopic: subscribeTopic, completion: completion)
+          let responseDelegate = MQTTResponseDelegate(
+                  subscribeTopic: subscribeTopic,
+                  errTopic: errTopic) { result in
+              // 收到 String 後，再解析成 T
+              switch result {
+              case .success(let jsonString):
+                  do {
+                      let decoded = try JSONDecoder().decode(T.self, from: Data(jsonString.utf8))
+                      completion(.success(decoded))
+                  } catch {
+                      print("JSON 解析失敗: \(error)\n原始資料: \(jsonString)")
+                      completion(.failure("資料格式錯誤"))
+                  }
+
+              case .failure(let errorMsg):
+                  completion(.failure(errorMsg))
+
+              case .timeout:
+                  completion(.timeout)
+              case .rawSuccess(let jsonString):
+                  completion(.rawSuccess(jsonString))
+              }
+          }
+          
           MQTTManager.shared.addTemporaryDelegate(responseDelegate)
 
           // 轉為json string
@@ -64,16 +96,19 @@ class MQTTUtils{
 /// 用於單次等待回覆的 delegate（含 timeout）
 class MQTTResponseDelegate: MQTTManagerDelegate {
     private let subscribeTopic: String
-    private let completion: (_ message: String) -> Void
+    private let errTopic: String
+    private let completion: (MQTTResponse<String>) -> Void
     private var timeoutTask: DispatchWorkItem?
     private var isCompleted = false
 
     init(
         subscribeTopic: String,
-        timeout: TimeInterval = 10, // 預設 10 秒
-        completion: @escaping (_ message: String) -> Void
+        errTopic: String,
+        timeout: TimeInterval = MQTTConfig.timeout,
+        completion: @escaping (MQTTResponse<String>) -> Void
     ) {
         self.subscribeTopic = subscribeTopic
+        self.errTopic = errTopic
         self.completion = completion
 
         // 啟動 timeout 計時
@@ -85,6 +120,7 @@ class MQTTResponseDelegate: MQTTManagerDelegate {
             // 取消訂閱與清理
             if let client = MQTTManager.shared.mqttClient {
                 client.unsubscribe(self.subscribeTopic)
+                client.unsubscribe(self.errTopic)
                 print("🚫 已取消訂閱 (逾時): \(self.subscribeTopic)")
             }
 
@@ -103,21 +139,28 @@ class MQTTResponseDelegate: MQTTManagerDelegate {
 
     func mqttMsgGet(topic: String, message: String) {
         // 只處理指定主題
-        guard topic == subscribeTopic, !isCompleted else { return }
+        guard topic == subscribeTopic || topic == errTopic, !isCompleted else { return }
 
         isCompleted = true
         timeoutTask?.cancel()
 
         print("✅ 已收到回覆: \(message) ")
 
-        // 呼叫回呼
-        completion(message)
-
-        // 收到後取消訂閱
-        if let client = MQTTManager.shared.mqttClient {
-            client.unsubscribe(subscribeTopic)
+        if topic == subscribeTopic{
+            // 呼叫回呼
+            completion(.success(message))
+            completion(.rawSuccess(message))
+        } else {
+            completion(.failure(message))
         }
+        cleanup()
+    }
 
+    private func cleanup() {
+        if let client = MQTTManager.shared.mqttClient {
+            client.unsubscribe([subscribeTopic, errTopic])
+        }
         MQTTManager.shared.removeTemporaryDelegate(self)
     }
 }
+

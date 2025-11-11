@@ -4,7 +4,6 @@
 //
 //  Created by Rafael Mai on 2025/10/22.
 //
-
 //┌───────────────────────────────────────────────────┐
 //│ App 啟動 (iOS 系統載入 App)                         │
 //└────────────────┬──────────────────────────────────┘
@@ -43,7 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         print("✅ App 初始化完成！！！")
-        UserDefaults.standard.set("djvhiuawhbviulrahbeiu", forKey: "jwt")
+//        UserDefaults.standard.set("djvhiuawhbviulrahbeiu", forKey: "jwt")
         MQTTManager.shared.startConnect()
 
         return true

@@ -48,24 +48,86 @@ extension MQTTUtils{
         }
     }
     
-    func publishLoginData(username: String, password: String){
+    struct RegisterResponse: Codable {
+        let token: String
+        // 支援 {"data": {"token": "..."}}
+        struct DataWrapper: Codable {
+            let token: String
+        }
+        let data: DataWrapper
+    }
+    
+    func publishRegisterData(username: String, email: String, password: String, firstname: String, lastname: String, nickname: String) async -> MQTTResponse<RegisterResponse>{
+        let data: [String: String] = [
+            "username": username,
+            "password": password,
+            "email": email,
+            "lastName": lastname,
+            "firstName": firstname,
+            "nickName": nickname,
+        ]
+        let ip: String = NetworkUtils.getIPAddress() ?? ""
+        return await publishAndGetData(action: Action.REGISTER.rawValue,
+                                          data: data,
+                                          clientId: MQTTConfig.clientID,
+                                          jwt: "",
+                                          ip: ip)
+    }
+    
+    struct LoginResponse: Codable {
+        let code: Int
+        let message: String
+        let data: DataWrapper?
+        let requestedTime: String?
+        let respondedTime: String?
+        
+        // 內層 data 結構
+        struct DataWrapper: Codable {
+            let token: String
+            let identity: String?
+            let loginTime: String?
+        }
+    }
+    
+    func publishLoginData(username: String, password: String) async -> MQTTResponse<LoginResponse>{
         let data: [String: String] = [
             "userAccount": username,
             "password": password
         ]
         let ip: String = NetworkUtils.getIPAddress() ?? ""
-        publishAndGetData(action: Action.LOGIN.rawValue,
-                          data: data,
-                          clientId: MQTTConfig.clientID,
-                          jwt: "",
-                          ip: ip)
+        return await publishAndGetData(action: Action.LOGIN.rawValue,
+                                       data: data,
+                                       clientId: MQTTConfig.clientID,
+                                       jwt: "",
+                                       ip: ip)
     }
     
-    func publishAndGetData(action: String, data: [String: String], clientId: String, jwt: String, ip: String){
+    func publishAndGetData<T: Decodable>(
+        action: String,
+        data: [String: String],
+        clientId: String,
+        jwt: String,
+        ip: String
+    ) async -> MQTTResponse<T> {
+        
         let topic = "req/\(action)/\(clientId)/\(jwt)/\(ip)"
-        func printAll(_ message: String){
-            print(message)
+        
+        return await withCheckedContinuation { continuation in
+            var isCompleted = false
+            
+            publishAndWaitResponse(data: data, publishTopic: topic) { reply in
+                guard !isCompleted else { return }
+                isCompleted = true
+                continuation.resume(returning: reply)
+            }
+            
+            // 超時處理
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(MQTTConfig.timeout * 1_000_000_000))
+                guard !isCompleted else { return }
+                isCompleted = true
+                continuation.resume(returning: .timeout)
+            }
         }
-        publishAndWaitResponse(data: data, publishTopic: topic, completion: printAll)
     }
 }

@@ -88,15 +88,55 @@ extension LoginVC: UITextFieldDelegate{
     }
 }
 
-extension LoginVC: PtButtonDelegate{
+extension LoginVC: PtButtonDelegate {
     func onClick(_ sender: PTButton) {
-        MQTTUtils.shared.publishLoginData(username: accountTextField.text ?? "", password: passwordTextField.text ?? "")
+        let username = accountTextField.text ?? ""
+        let password = passwordTextField.text ?? ""
+
+        Task { @MainActor in
+            let response = await MQTTUtils.shared.publishLoginData(username: username, password: password)
+
+            switch response {
+            case .success(let msg):
+                print("登入成功")
+                guard let jwt = msg.data?.token else{ return }
+                AuthManager.shared.saveJWT(jwt)
+                navigateToHomeAuth()
+
+            case .failure(let errorMsg):
+                // 自動彈出後端錯誤訊息！
+                CommonAlertManager.showMessage(
+                    on: self,
+                    title: "登入失敗",
+                    message: errorMsg
+                )
+
+            case .timeout:
+                CommonAlertManager.showMessage(
+                    on: self,
+                    title: "連線逾時",
+                    message: "請檢查網路後重試"
+                )
+            case .rawSuccess(let msg):
+                print("rawSuccess: " + msg)
+            }
+        }
+    }
+    
+    func navigateToHomeAuth(){
+        let newRootVC = HomeVCAuth()
+        let nav = UINavigationController(rootViewController: newRootVC)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first {
+               window.rootViewController = nav
+            UIView.transition(with: window, duration: 0.5, options: .curveEaseInOut, animations: nil)
+           }
     }
 }
-
-
-
-
-#Preview {
-    LoginVC()
-}
+//
+//
+//
+//
+//#Preview {
+//    LoginVC()
+//}

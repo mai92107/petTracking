@@ -45,15 +45,12 @@ class LoadingViewController: UIViewController {
 
 
     func showMainViewController() {
-        // 假設你用 UserDefaults 存 JWT
-        let jwt = UserDefaults.standard.string(forKey: "jwt") ?? ""
-        
         let rootVC: UIViewController
-        if jwt.isEmpty {
+        if !AuthManager.shared.isLoggedIn() {
             // 未登入，顯示 HomeVC
             rootVC = HomeVC()
         } else {
-            // 已登入，顯示 TrackingVC
+            // 已登入，顯示 HomeVCAuth
             rootVC = HomeVCAuth()
         }
         let nav = UINavigationController(rootViewController: rootVC)

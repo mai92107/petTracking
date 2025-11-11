@@ -26,5 +26,8 @@ struct MQTTConfig {
     static let qos: CocoaMQTTQoS = .qos0
     
     // Client ID 前綴
-    static let clientID = "iOS_PetTracker"
+    static let clientID = "iOS_PetTracker_"
+    
+    // Mqtt Msg timeout
+    static let timeout: TimeInterval = 10
 }

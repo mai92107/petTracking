@@ -15,8 +15,8 @@ struct MQTTConfig {
     static let port: UInt16 = 1883
     
     // 認證資訊 (如果需要)
-    static let username: String? = nil  // 有帳號就填入 "your_username"
-    static let password: String? = nil  // 有密碼就填入 "your_password"
+    static let username: String? = nil
+    static let password: String? = nil
     
     // 連線設定
     static let keepAlive: UInt16 = 60
@@ -26,5 +26,5 @@ struct MQTTConfig {
     static let qos: CocoaMQTTQoS = .qos0
     
     // Client ID 前綴
-    static let clientID = "iOS_PetTracker_AA000001"
+    static let clientID = "iOS_PetTracker"
 }

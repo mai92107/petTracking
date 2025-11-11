@@ -1,9 +1,45 @@
+
 //
 //  SceneDelegate.swift
 //  petTracking
 //
 //  Created by Rafael Mai on 2025/10/22.
 //
+//┌──────────────────────────┐
+//│ App 啟動                 │
+//│（系統建立 Scene）         │
+//└────────────┬─────────────┘
+//             ↓
+//┌──────────────────────────┐
+//│ scene(_:willConnectTo:)  │
+//│ 初始化 UIWindow、rootVC   │
+//└────────────┬─────────────┘
+//             ↓
+//┌──────────────────────────┐
+//│ sceneDidBecomeActive     │
+//│ App 變活躍（開始運作）   │
+//└────────────┬─────────────┘
+//             ↓
+//┌──────────────────────────┐
+//│ sceneWillResignActive    │
+//│ 暫時中斷（例如來電）     │
+//└────────────┬─────────────┘
+//             ↓
+//┌──────────────────────────┐
+//│ sceneDidEnterBackground  │
+//│ 進入背景、儲存資料       │
+//└────────────┬─────────────┘
+//             ↓
+//┌──────────────────────────┐
+//│ sceneWillEnterForeground │
+//│ 回到前景（尚未活躍）     │
+//└────────────┬─────────────┘
+//             ↓
+//┌──────────────────────────┐
+//│ sceneDidBecomeActive     │
+//│ 再次活躍（恢復操作）     │
+//└──────────────────────────┘
+
 
 import UIKit
 
@@ -17,10 +53,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-//        let trackingVC = TrackingVC()
-        let homeVC = HomeVC()
+        let loadingVC = LoadingViewController()
         
-        let navController = UINavigationController(rootViewController: homeVC)
+        let navController = UINavigationController(rootViewController: loadingVC)
         
         window.rootViewController = navController
         self.window = window

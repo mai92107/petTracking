@@ -21,11 +21,13 @@ class LocationManager: NSObject {
     private let locationManager = CLLocationManager()
     weak var delegate: LocationManagerDelegate?
     
+    static let shared = LocationManager()
+    
     // 用於記錄用戶是否想要開始追蹤(用於權限請求後自動開始)
     private var shouldStartAfterAuthorization = false
     
     // MARK: - Init
-    override init() {
+    override private init() {
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest

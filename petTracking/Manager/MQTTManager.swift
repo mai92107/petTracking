@@ -39,11 +39,12 @@ class MQTTManager {
     // 連接 MQTT
     func startConnect() {
 
-        // 如果已經有 client 且已連線,不重複連線
-        if let client = mqttClient, client.connState == .connected {
-            print("⚠️ MQTT 已經連線")
+        // 如果已經有 client 且已經連線或連線中,不重複連線
+        if let client = mqttClient, client.connState == .connected || client.connState == .connecting {
+            print("⚠️ MQTT 已經連線或連線中")
             return
         }
+
         
         mqttClient = CocoaMQTT(clientID: clientID, host: MQTTConfig.host, port: MQTTConfig.port)
         
@@ -57,6 +58,7 @@ class MQTTManager {
         // 嘗試連線
         let success = mqttClient?.connect() ?? false
         print(success ? "🔄 正在連接 MQTT Broker..." : "❌ MQTT 連線啟動失敗")
+
     }
     
     // 斷線
@@ -114,6 +116,6 @@ extension MQTTManager: CocoaMQTTDelegate {
     func mqttDidDisconnect(_ mqtt: CocoaMQTT, withError err: Error?) {
         isConnect = false
         delegate?.mqttStatusChanged(isConnected: isConnect)
-        print("系統連線中斷")
+        print("系統連線中斷, 原因是 \(err!)")
     }
 }

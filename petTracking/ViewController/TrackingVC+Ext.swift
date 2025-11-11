@@ -14,27 +14,28 @@ final class TrackingVC: UIViewController {
     private let titleLabel = PTLabel(text: "Pet Tracking System", with: .title)
     private let actionButton = PTButton(title: "開始定位", Vpadding: 15, Hpadding: 40)
     private let infoView = TrackingInfoView()
-    private let locationManager = LocationManager()
     
     // MARK: - Properties
     private var isTracking = false
+    private var isConnected = MQTTManager.shared.isConnect
     
     // MARK: - View Entrence
     override func viewDidLoad() {
         super.viewDidLoad()
         setupConfig()
         setupUI()
+        infoView.mqttStatusLabel.updateMQTTStatus(isConnected: isConnected)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        locationManager.checkAuthorizationStatus()
+        LocationManager.shared.checkAuthorizationStatus()
     }
     
     // MARK: - Config
     private func setupConfig(){
         actionButton.ptDelegate = self
-        locationManager.delegate = self
+        LocationManager.shared.delegate = self
         MQTTManager.shared.delegate = self
     }
     
@@ -80,14 +81,14 @@ extension TrackingVC: PtButtonDelegate{
             return
         }
         
-        locationManager.requestAuthorizationAndStart()
+        LocationManager.shared.requestAuthorizationAndStart()
         
         isTracking = true
         actionButton.setTitle("停止定位", for: .normal)
     }
     
     private func stopTracking() {
-        locationManager.stopUpdatingLocation()
+        LocationManager.shared.stopUpdatingLocation()
         isTracking = false
         actionButton.setTitle("開始定位", for: .normal)
         infoView.locationLabel.resetLabels()
@@ -146,15 +147,9 @@ extension TrackingVC: LocationManagerDelegate {
 
 extension TrackingVC: MQTTManagerDelegate{
     func mqttMsgGet(topic: String, message: String) {
-        print(topic)
     }
     
     func mqttStatusChanged(isConnected: Bool) {
         infoView.mqttStatusLabel.updateMQTTStatus(isConnected: isConnected)
     }
-}
-
-
-#Preview {
-    TrackingVC()
 }

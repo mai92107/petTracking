@@ -10,11 +10,15 @@ import Foundation
 enum Action: String {
     case LOGIN = "account_login"
     case REGISTER = "account_register"
+    
     case HELLO = "home_hello"
+    
     case SYSTEM_STATUS = "system_status"
-    case DEVICE_STATUS = "device_status"
     case ADD_DEVICE = "member_addDevice"
+
+    case DEVICE_STATUS = "device_status"
 }
+
 extension MQTTUtils{
     
     // 發布位置資料

@@ -26,7 +26,6 @@ final class LoginVC: UIViewController {
         super.viewDidLoad()
         setupConfig()
         setupLayout()
-        MQTTManager.shared.startConnect()
 
     }
     

@@ -14,7 +14,7 @@ class PTHorizontalStackView: UIStackView {
         
         self.axis = .horizontal
         self.alignment = .fill
-        self.distribution = .equalSpacing
+        self.distribution = .fillEqually
         self.spacing = padding
         self.translatesAutoresizingMaskIntoConstraints = false
         

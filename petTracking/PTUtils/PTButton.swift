@@ -8,31 +8,31 @@
 import UIKit
 
 protocol PtButtonDelegate: AnyObject {
-    func onClick()
+    func onClick(_ sender: PTButton)
 }
 
 class PTButton: UIButton {
     
     weak var ptDelegate: PtButtonDelegate?
 
-    init(title: String) {
+    init(title: String, Vpadding: CGFloat, Hpadding: CGFloat) {
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false
         
         let bgColor: UIColor = .ptPrimary
         let textColor: UIColor = .ptQuinary
         
-        let pdTop: CGFloat = 10
-        let pdLeft: CGFloat = 30
-        let pdRight: CGFloat = 30
-        let pdBottom: CGFloat = 10
+        let pdTop: CGFloat = Vpadding
+        let pdLeft: CGFloat = Hpadding
+        let pdRight: CGFloat = Hpadding
+        let pdBottom: CGFloat = Vpadding
         
         if #available(iOS 15.0, *) {
             var config = UIButton.Configuration.filled()
             config.title = title
             config.baseBackgroundColor = bgColor
             config.baseForegroundColor = textColor
-            config.cornerStyle = .medium
+            config.cornerStyle = .capsule
 
             // padding
             config.contentInsets = NSDirectionalEdgeInsets(top: pdTop, leading: pdLeft, bottom: pdBottom, trailing: pdRight)
@@ -62,7 +62,7 @@ class PTButton: UIButton {
     }
     
     @objc func buttonTapped(){
-        ptDelegate?.onClick()
+        ptDelegate?.onClick(self)
     }
     
     required init?(coder: NSCoder) {

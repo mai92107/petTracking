@@ -18,10 +18,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
 //        let trackingVC = TrackingVC()
-//        let loginVC = LoginVC()
-        let registerVC = RegisterVC()
+        let homeVC = HomeVC()
         
-        let navController = UINavigationController(rootViewController: registerVC)
+        let navController = UINavigationController(rootViewController: homeVC)
         
         window.rootViewController = navController
         self.window = window

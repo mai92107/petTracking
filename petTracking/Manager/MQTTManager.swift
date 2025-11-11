@@ -10,6 +10,7 @@ import CocoaMQTT
 
 protocol MQTTManagerDelegate: AnyObject{
     func mqttStatusChanged(isConnected: Bool)
+    func mqttMsgGet(topic: String, message: String)
 }
 
 class MQTTManager {
@@ -18,12 +19,22 @@ class MQTTManager {
     public var mqttClient: CocoaMQTT?
 
     weak var delegate: MQTTManagerDelegate?
+    
+    private var temporaryDelegates = [MQTTManagerDelegate]()
 
     private let clientID = MQTTConfig.clientID
     
     public var isConnect = false
     
     private init() {}
+    
+    func addTemporaryDelegate(_ delegate: MQTTManagerDelegate) {
+            temporaryDelegates.append(delegate)
+    }
+
+    func removeTemporaryDelegate(_ delegate: MQTTManagerDelegate) {
+        temporaryDelegates.removeAll { $0 === delegate }
+    }
     
     // 連接 MQTT
     func startConnect() {
@@ -74,9 +85,14 @@ extension MQTTManager: CocoaMQTTDelegate {
         print("✓ 訊息確認送達")
     }
     
+    // CocoaMQTT 收到訊息
     func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16) {
-        print("📨 收到訊息: \(message.topic)")
-        // 接收訊息
+        guard let payload = message.string else { return }
+
+        // 多個 工人 delegate
+        for tempDelegate in temporaryDelegates {
+            tempDelegate.mqttMsgGet(topic: message.topic, message: payload)
+        }
     }
     
     func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopics success: NSDictionary, failed: [String]) {

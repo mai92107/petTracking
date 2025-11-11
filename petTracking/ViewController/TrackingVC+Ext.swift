@@ -12,7 +12,7 @@ final class TrackingVC: UIViewController {
     
     // MARK: - UI Components
     private let titleLabel = PTLabel(text: "Pet Tracking System", with: .title)
-    private let actionButton = PTButton(title: "開始定位")
+    private let actionButton = PTButton(title: "開始定位", Vpadding: 15, Hpadding: 40)
     private let infoView = TrackingInfoView()
     private let locationManager = LocationManager()
     
@@ -24,7 +24,6 @@ final class TrackingVC: UIViewController {
         super.viewDidLoad()
         setupConfig()
         setupUI()
-        MQTTManager.shared.startConnect()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -66,7 +65,7 @@ final class TrackingVC: UIViewController {
 
 // MARK: - Tracking Control
 extension TrackingVC: PtButtonDelegate{
-    func onClick() {
+    func onClick(_ sender: PTButton) {
         isTracking ? stopTracking() : startTracking()
     }
     
@@ -146,12 +145,16 @@ extension TrackingVC: LocationManagerDelegate {
 }
 
 extension TrackingVC: MQTTManagerDelegate{
+    func mqttMsgGet(topic: String, message: String) {
+        print(topic)
+    }
+    
     func mqttStatusChanged(isConnected: Bool) {
         infoView.mqttStatusLabel.updateMQTTStatus(isConnected: isConnected)
     }
 }
 
 
-//#Preview {
-//    TrackingVC()
-//}
+#Preview {
+    TrackingVC()
+}

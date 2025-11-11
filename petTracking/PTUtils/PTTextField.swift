@@ -19,7 +19,7 @@ class PTTextField: UITextField{
         self.keyboardType = keyboardType
         self.isSecureTextEntry = isSecureText
         self.translatesAutoresizingMaskIntoConstraints = false
-        self.font = UIFont.systemFont(ofSize: 28)
+        self.font = UIFont.systemFont(ofSize: 20)
         self.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0)
         
         underline.backgroundColor = UIColor.gray.cgColor

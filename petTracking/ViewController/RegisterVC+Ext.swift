@@ -21,8 +21,9 @@ final class RegisterVC: UIViewController {
     private let lastnameTextField = PTTextField(placeholder: "姓氏", with: .default, isSecureText: true)
     private let nicknameTextField = PTTextField(placeholder: "暱稱*", with: .default, isSecureText: true)
     
-    private let actionButton = PTButton(title: "註冊")
-    private let goLoginLabel = PTLabel(text: "已經有帳號？ 前往登入", with: .memo)
+    private let actionButton = PTButton(title: "註冊", Vpadding: 15 ,Hpadding: 0)
+    private let goLoginLabel = PTLabel(text: "已經有帳號？", with: .memo)
+    private lazy var goLoginAnchorLabel = PTLabel(text: " 前往登入", color: .secondaryLabel, fontSize: 15, in: self)
 
     
     // MARK: - Lifecycle
@@ -42,49 +43,56 @@ final class RegisterVC: UIViewController {
         lastnameTextField.delegate = self
         nicknameTextField.delegate = self
         actionButton.ptDelegate = self
+        goLoginAnchorLabel.ptDelegate = self
     }
     
     // MARK: - Layout
     private func setupLayout() {
-        view.backgroundColor = .white
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .ptQuaternary
+        
+        let accountView = PTHorizontalStackView(in: 20, views: [usernameTextField, passwordTextField])
 
-        let textView = PTVerticalStackView(in: 30, views: [usernameTextField, emailTextField, passwordTextField, firstnameTextField, lastnameTextField, nicknameTextField])
-        scrollView.addSubview(textView)
+        let nameView = PTHorizontalStackView(in: 20, views: [firstnameTextField, lastnameTextField])
+
+        let formView = PTVerticalStackView(in: 30, views: [accountView, emailTextField, nicknameTextField, nameView, actionButton]).withBackground(color: UIColor(white: 1, alpha: 0.7), cornerRadius: 25, Vpadding: 40, Hpadding: 15)
+
+        let gotoLabel = PTHorizontalStackView(in: 5, views: [goLoginLabel, goLoginAnchorLabel])
 
         view.addSubview(titleLabel)
-        view.addSubview(scrollView)
-        view.addSubview(actionButton)
-        view.addSubview(goLoginLabel)
+        view.addSubview(formView)
+        view.addSubview(gotoLabel)
         
-        let vPadding: CGFloat = 120
-        let hPadding: CGFloat = 50
+        let hPadding: CGFloat = 30
         
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: vPadding),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            // ScrollView 中間區塊，高度一半
-            scrollView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: hPadding),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -hPadding),
-            scrollView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3),
+            formView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 40),
+            formView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: hPadding),
+            formView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -hPadding),
             
-            // textStack 綁定 scrollView
-            textView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            textView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            textView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            
-            actionButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: hPadding),
-            actionButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -hPadding),
-            actionButton.bottomAnchor.constraint(equalTo: goLoginLabel.topAnchor, constant: -10),
-            
-            goLoginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            goLoginLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -vPadding)
+            gotoLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            gotoLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -100),
         ])
     }
 }
+
+extension RegisterVC: PTLabelDegate{
+    func goto() {
+        if let nav = navigationController {
+            for vc in nav.viewControllers {
+                if vc is LoginVC {
+                    nav.popToViewController(vc, animated: true)
+                    return
+                }
+            }
+            // 如果不存在才 push
+            nav.pushViewController(LoginVC(), animated: true)
+        }
+    }
+}
+
 extension RegisterVC: UITextFieldDelegate{
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -92,7 +100,7 @@ extension RegisterVC: UITextFieldDelegate{
     }
 }
 extension RegisterVC: PtButtonDelegate{
-    func onClick() {
+    func onClick(_ sender: PTButton) {
         let data: [String: String] = [
             "usernameTextField": usernameTextField.text ?? "",
             "emailTextField": emailTextField.text ?? "",
@@ -101,7 +109,10 @@ extension RegisterVC: PtButtonDelegate{
             "lastnameTextField": lastnameTextField.text ?? "",
             "nicknameTextField": nicknameTextField.text ?? ""
         ]
-        print(data)
+        func printAll(_ message: String){
+            print(message)
+        }
+        MQTTUtils.shared.publishAndWaitResponse(data: data, publishTopic: "req/123", completion: printAll)
     }
 }
 

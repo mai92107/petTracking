@@ -10,7 +10,8 @@ import CocoaMQTT
 
 struct MQTTConfig {
     // MQTT Broker 設定
-    static let host = "test.mosquitto.org"
+//    static let host = "test.mosquitto.org"
+    static let host = "mqttgo.io"
     static let port: UInt16 = 1883
     
     // 認證資訊 (如果需要)
@@ -25,5 +26,5 @@ struct MQTTConfig {
     static let qos: CocoaMQTTQoS = .qos0
     
     // Client ID 前綴
-    static let clientID = "iOS_PetTracker"
+    static let clientID = "iOS_PetTracker_AA000001"
 }

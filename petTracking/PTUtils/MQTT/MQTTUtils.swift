@@ -11,9 +11,9 @@ import CocoaMQTT
 
 enum MQTTResponse<T> {
     case success(T)             // 正常回覆
-    case failure(String)        // 後端錯誤訊息
+    case failure(T)             // 後端錯誤訊息
     case timeout                // 逾時
-    case rawSuccess(String)
+    case rawResponse(String)
 }
 
 class MQTTUtils{
@@ -66,17 +66,21 @@ class MQTTUtils{
                       let decoded = try JSONDecoder().decode(T.self, from: Data(jsonString.utf8))
                       completion(.success(decoded))
                   } catch {
-                      print("JSON 解析失敗: \(error)\n原始資料: \(jsonString)")
-                      completion(.failure("資料格式錯誤"))
+                      print("⚠️ 錯誤訊息不是 CommonResponse 格式: \(jsonString)")
                   }
 
               case .failure(let errorMsg):
-                  completion(.failure(errorMsg))
+                  do {
+                      let decoded = try JSONDecoder().decode(T.self, from: Data(errorMsg.utf8))
+                      completion(.failure(decoded))
+                  } catch {
+                      print("⚠️ 錯誤訊息不是 CommonResponse 格式: \(errorMsg)")
+                  }
 
               case .timeout:
                   completion(.timeout)
-              case .rawSuccess(let jsonString):
-                  completion(.rawSuccess(jsonString))
+              case .rawResponse(let jsonString):
+                  completion(.rawResponse(jsonString))
               }
           }
           
@@ -149,10 +153,10 @@ class MQTTResponseDelegate: MQTTManagerDelegate {
         if topic == subscribeTopic{
             // 呼叫回呼
             completion(.success(message))
-            completion(.rawSuccess(message))
         } else {
             completion(.failure(message))
         }
+        completion(.rawResponse(message))
         cleanup()
     }
 

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class LoadingViewController: UIViewController {
+class LoadingViewController: BaseVC {
 
     private let progressView = UIProgressView(progressViewStyle: .default)
     private var progress: Float = 0.0
@@ -17,7 +17,7 @@ class LoadingViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupProgressView()
-        startProgress()
+        startProgress(showMainViewController)
     }
 
     private func setupProgressView() {
@@ -29,7 +29,7 @@ class LoadingViewController: UIViewController {
         view.addSubview(progressView)
     }
 
-    private func startProgress() {
+    private func startProgress(_ completion: @escaping()->Void) {
         // 模擬進度，每0.05秒增加0.01
         timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
             guard let self = self else { return }
@@ -37,7 +37,7 @@ class LoadingViewController: UIViewController {
             self.progressView.setProgress(self.progress, animated: true)
 
             if self.progress >= 1.0 {
-                self.showMainViewController()
+                completion()
                 self.timer?.invalidate()
             }
         }
@@ -45,19 +45,11 @@ class LoadingViewController: UIViewController {
 
 
     func showMainViewController() {
-        let rootVC: UIViewController
         if !AuthManager.shared.isLoggedIn() {
-            // 未登入，顯示 HomeVC
-            rootVC = HomeVC()
+            SceneNavigator.shared.switchToUnAuth()
         } else {
-            // 已登入，顯示 HomeVCAuth
-            rootVC = HomeVCAuth()
+            SceneNavigator.shared.switchToAuth()
+            print(AuthManager.shared.getJWT()!)
         }
-        let nav = UINavigationController(rootViewController: rootVC)
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first {
-               window.rootViewController = nav
-               UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil)
-           }
     }
 }

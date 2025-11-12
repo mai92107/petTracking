@@ -7,11 +7,12 @@
 
 import UIKit
 
-final class SuperVC<childView: UIViewController>: UIViewController {
+final class SuperVC<childView: BaseVC>: BaseVC {
        
     override func viewDidLoad(){
         super.viewDidLoad()
         setupLayout()
+        
     }
     
     func setupLayout(){

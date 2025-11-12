@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class HomeVC: UIViewController{
+final class HomeVC: BaseVC{
     
     private let gotoLoginButton = PTButton(title: "前往登入", Vpadding: 15, Hpadding: 20)
     private let gotoRegisterButton = PTButton(title: "前往註冊", Vpadding: 15, Hpadding: 20)

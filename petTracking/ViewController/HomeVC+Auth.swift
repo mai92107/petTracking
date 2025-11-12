@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class HomeVCAuth: UIViewController{
+final class HomeVCAuth: BaseVC{
     
     private let gotoTrackingButton = PTButton(title: "裝置定位", Vpadding: 15, Hpadding: 20)
     private let gotoDeviceStatusButton = PTButton(title: "裝置狀態", Vpadding: 15, Hpadding: 20)
@@ -54,12 +54,12 @@ extension HomeVCAuth: PtButtonDelegate{
         case gotoDeviceStatusButton:
             print("device status button tapped")
             if let nav = navigationController {
-                nav.pushViewController(TrackingVC(), animated: true)
+                nav.pushViewController(DevStatusVC(), animated: true)
             }
         case gotoSystemStatusButton:
             print("system status button tapped")
             if let nav = navigationController {
-                nav.pushViewController(TrackingVC(), animated: true)
+                nav.pushViewController(SysStatusVC(), animated: true)
             }
         default:
             print("Error unknown button were tapped!")

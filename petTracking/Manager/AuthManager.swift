@@ -4,34 +4,42 @@
 //
 //  Created by Rafael Mai on 2025/10/30.
 //
-
-import UIKit
+import Foundation
 
 class AuthManager {
     static let shared = AuthManager()
+
+    private let jwtKey = "jwt_token"
+    private let defaults = UserDefaults.standard
+
+    private var jwtToken: String? {
+        get { defaults.expirableValue(forKey: jwtKey, type: String.self) }
+        set {
+            if let token = newValue {
+                defaults.set(token, forKey: jwtKey, expireAfter: 60 * 60)
+            } else {
+                defaults.removeObject(forKey: jwtKey)
+            }
+            // ⚡ 每次改變登入狀態就廣播
+            NotificationCenter.default.post(name: .authStateChanged, object: nil)
+        }
+    }
+
+    func isLoggedIn() -> Bool {
+        return jwtToken != nil
+    }
+
     private init() {}
     
-    private let jwtKey = UserConfig.jwtKey
-        
-    // 儲存 JWT
-    func saveJWT(_ token: String) {
-        UserDefaults.standard.set(token, forKey: jwtKey)
-        print("✅ JWT 已儲存")
+    func logout() {
+        jwtToken = nil
     }
     
-    // 取得 JWT
-    func getJWT() -> String? {
-        return UserDefaults.standard.string(forKey: jwtKey)
+    func setJwt(_ jwt: String){
+        jwtToken = jwt
     }
     
-    // 清除 JWT
-    func clearJWT() {
-        UserDefaults.standard.removeObject(forKey: jwtKey)
-        print("🗑️ JWT 已清除")
-    }
-    
-    // 檢查是否已登入
-    func isLoggedIn() -> Bool {
-        return getJWT() != nil
+    func getJWT() -> String?{
+        return jwtToken
     }
 }

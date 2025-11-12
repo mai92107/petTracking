@@ -8,13 +8,13 @@
 import UIKit
 import CoreLocation
 
-final class TrackingVC: UIViewController {
+final class TrackingVC: BaseVC {
     
     // MARK: - UI Components
     private let titleLabel = PTLabel(text: "Pet Tracking System", with: .title)
     private let actionButton = PTButton(title: "開始定位", Vpadding: 15, Hpadding: 40)
-    private let infoView = TrackingInfoView()
-    
+    private let locationLabel = LocationView()
+
     // MARK: - Properties
     private var isTracking = false
     private var isConnected = MQTTManager.shared.isConnect
@@ -24,7 +24,6 @@ final class TrackingVC: UIViewController {
         super.viewDidLoad()
         setupConfig()
         setupUI()
-        infoView.mqttStatusLabel.updateMQTTStatus(isConnected: isConnected)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -36,7 +35,6 @@ final class TrackingVC: UIViewController {
     private func setupConfig(){
         actionButton.ptDelegate = self
         LocationManager.shared.delegate = self
-        MQTTManager.shared.delegate = self
     }
     
     // MARK: - Layout
@@ -44,7 +42,7 @@ final class TrackingVC: UIViewController {
         view.backgroundColor = .ptQuaternary
         
         view.addSubview(titleLabel)
-        view.addSubview(infoView)
+        view.addSubview(locationLabel)
         view.addSubview(actionButton)
         
         let padding: CGFloat = 40
@@ -56,9 +54,9 @@ final class TrackingVC: UIViewController {
             actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -padding),
 
-            infoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            infoView.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -padding),
-            infoView.heightAnchor.constraint(equalToConstant: 100)
+            locationLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            locationLabel.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -padding),
+            locationLabel.heightAnchor.constraint(equalToConstant: 100)
 
         ])
     }
@@ -76,11 +74,6 @@ extension TrackingVC: PtButtonDelegate{
             return
         }
         
-        if !AuthManager.shared.isLoggedIn(){
-            showNotLoginAlert()
-            return
-        }
-        
         LocationManager.shared.requestAuthorizationAndStart()
         
         isTracking = true
@@ -91,7 +84,7 @@ extension TrackingVC: PtButtonDelegate{
         LocationManager.shared.stopUpdatingLocation()
         isTracking = false
         actionButton.setTitle("開始定位", for: .normal)
-        infoView.locationLabel.resetLabels()
+        locationLabel.resetLabels()
     }
 }
 
@@ -104,8 +97,8 @@ extension TrackingVC: LocationManagerDelegate {
     }
     
     private func updateLocationDisplay(latitude: Double, longitude: Double) {
-        infoView.locationLabel.updateLatitude(abs(latitude))
-        infoView.locationLabel.updateLongitude(abs(longitude))
+        locationLabel.updateLatitude(abs(latitude))
+        locationLabel.updateLongitude(abs(longitude))
     }
     
     private func sendLocationData(latitude: Double, longitude: Double) {
@@ -126,7 +119,7 @@ extension TrackingVC: LocationManagerDelegate {
     
     func didFail(error: Error) {
         print("❌ 定位錯誤: \(error.localizedDescription)")
-        infoView.locationLabel.showLocationError("定位失敗")
+        locationLabel.showLocationError("定位失敗")
     }
     
     private func showPermissionDeniedAlert() {
@@ -142,14 +135,5 @@ extension TrackingVC: LocationManagerDelegate {
         })
         alert.addAction(UIAlertAction(title: "取消", style: .cancel))
         present(alert, animated: true)
-    }
-}
-
-extension TrackingVC: MQTTManagerDelegate{
-    func mqttMsgGet(topic: String, message: String) {
-    }
-    
-    func mqttStatusChanged(isConnected: Bool) {
-        infoView.mqttStatusLabel.updateMQTTStatus(isConnected: isConnected)
     }
 }

@@ -9,13 +9,9 @@ import UIKit
 
 final class MqttStatusView: UIView {
     
-    // MARK: - Constants
-    private enum Constants {
-        static let defaultMQTTLabel = "MQTT: 未連線"
-    }
-    
     // MARK: - UI Components
-    private let mqttStatusLabel = PTLabel(text: Constants.defaultMQTTLabel, with: .subtitle)
+    private let mqttGoStatusLabel = PTLabel(text: "MQTT-GO: ----", with: .subtitle)
+    private let mqttUIKStatusLabel = PTLabel(text: "MQTT-UIK: ----", with: .subtitle)
     
     // MARK: - Init
     override init(frame: CGRect) {
@@ -30,25 +26,36 @@ final class MqttStatusView: UIView {
     
     // MARK: - Setup
     private func setupUI() {
-        addSubview(mqttStatusLabel)
+        addSubview(mqttGoStatusLabel)
+        addSubview(mqttUIKStatusLabel)
         
         let padding: CGFloat = 5
         
         NSLayoutConstraint.activate([
-            mqttStatusLabel.topAnchor.constraint(equalTo: topAnchor, constant: padding),
-            mqttStatusLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            mqttGoStatusLabel.topAnchor.constraint(equalTo: topAnchor, constant: padding),
+            mqttGoStatusLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            
+            mqttUIKStatusLabel.topAnchor.constraint(equalTo: mqttGoStatusLabel.bottomAnchor, constant: padding),
+            mqttUIKStatusLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
         ])
     }
     
     // MARK: - Public Update Methods
     
-    func updateMQTTStatus(isConnected: Bool) {
-        mqttStatusLabel.text = isConnected ? "MQTT: 已連線 ✓" : "MQTT: 未連線 ᙮"
-        mqttStatusLabel.textColor = isConnected ? .ptSecondary : .ptTertiary
+    func updateMQTTGoStatus(status: String) {
+        var isConnected = false
+        if status == "連線正常"{
+            isConnected = true
+        }
+        if status == "連線斷開"{
+            isConnected = false
+        }
+        mqttGoStatusLabel.text = "MQTT-GO: \(status) \(isConnected ? "✓" : "᙮")"
+        mqttGoStatusLabel.textColor = isConnected ? .ptSecondary : .ptTertiary
     }
-    
-    func showMQTTError() {
-        mqttStatusLabel.text = "MQTT: 未登入"
-        mqttStatusLabel.textColor = .systemRed
+    func updateMQTTUIKStatus(isConnected: Bool) {
+        mqttUIKStatusLabel.text = isConnected ? "MQTT-UIK: 已連線 ✓" : "QTT-UIK: 未連線 ᙮"
+        mqttUIKStatusLabel.textColor = isConnected ? .ptSecondary : .ptTertiary
     }
+
 }

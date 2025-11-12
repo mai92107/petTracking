@@ -10,6 +10,6 @@ import CocoaMQTT
 
 struct UserConfig {
 
-    static let jwtKey = "default_jwt_key"
+//    static let jwtKey = "default_jwt_key"
    
 }

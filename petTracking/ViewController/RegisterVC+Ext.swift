@@ -8,7 +8,7 @@
 
 import UIKit
 
-final class RegisterVC: UIViewController {
+final class RegisterVC: BaseVC {
     
     // MARK: - UI Elements
     
@@ -116,32 +116,20 @@ extension RegisterVC: PtButtonDelegate{
                                                                    nickname: nickname!)
             switch response {
             case .success(let msg):
-                print("註冊成功: \(msg)")
-                navigateToHomeAuth()
+                print("註冊成功: \(msg.data)")
+                let jwt = msg.data.token
+                AuthManager.shared.setJwt(jwt)
 
             case .failure(let errorMsg):
                 // 自動彈出後端錯誤訊息！
-                CommonAlertManager.showMessage(
-                    on: self,
-                    title: "註冊失敗",
-                    message: errorMsg
-                )
+                showMessageAlert(title: "註冊失敗",message: errorMsg.message)
 
             case .timeout:
-                CommonAlertManager.showMessage(
-                    on: self,
-                    title: "連線逾時",
-                    message: "請檢查網路後重試"
-                )
-            case .rawSuccess(let msg):
-                print("rawSuccess: " + msg)
+                showMessageAlert(title: "連線逾時",message: "請檢查網路後重試")
+                
+            case .rawResponse(let msg):
+                print("rawResponse: " + msg)
             }
-        }
-    }
-    
-    func navigateToHomeAuth(){
-        if let nav = navigationController {
-            nav.pushViewController(HomeVCAuth(), animated: true)
         }
     }
 }

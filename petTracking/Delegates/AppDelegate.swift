@@ -42,9 +42,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         print("✅ App 初始化完成！！！")
-//        UserDefaults.standard.set("djvhiuawhbviulrahbeiu", forKey: "jwt")
         MQTTManager.shared.startConnect()
-
+        
         return true
     }
 

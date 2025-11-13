@@ -12,6 +12,7 @@ final class HomeVCAuth: BaseVC{
     private let gotoTrackingButton = PTButton(title: "裝置定位", Vpadding: 15, Hpadding: 20)
     private let gotoDeviceStatusButton = PTButton(title: "裝置狀態", Vpadding: 15, Hpadding: 20)
     private let gotoSystemStatusButton = PTButton(title: "系統狀態", Vpadding: 15, Hpadding: 20)
+    private let gotoLogoutButton = PTButton(title: "登出裝置", Vpadding: 15, Hpadding: 20)
     
     override func viewDidLoad(){
         super.viewDidLoad()
@@ -23,10 +24,11 @@ final class HomeVCAuth: BaseVC{
         gotoTrackingButton.ptDelegate = self
         gotoDeviceStatusButton.ptDelegate = self
         gotoSystemStatusButton.ptDelegate = self
+        gotoLogoutButton.ptDelegate = self
     }
     
     func setupLayout(){
-        let buttons = PTVerticalStackView(in: 20, views: [gotoTrackingButton, gotoDeviceStatusButton,gotoSystemStatusButton])
+        let buttons = PTVerticalStackView(in: 20, views: [gotoTrackingButton, gotoDeviceStatusButton,gotoSystemStatusButton, gotoLogoutButton])
         
         view.backgroundColor = .ptQuaternary
         
@@ -61,6 +63,9 @@ extension HomeVCAuth: PtButtonDelegate{
             if let nav = navigationController {
                 nav.pushViewController(SysStatusVC(), animated: true)
             }
+        case gotoLogoutButton:
+            print("logout button were tapped")
+            AuthManager.shared.logout()
         default:
             print("Error unknown button were tapped!")
         }

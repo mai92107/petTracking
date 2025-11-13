@@ -13,6 +13,7 @@ enum Action: String {
     
     case HELLO = "home_hello"
     
+    case RECORDING = "device_recording"
     case SYSTEM_STATUS = "system_status"
     case ADD_DEVICE = "member_addDevice"
     case DEVICE_STATUS = "device_status"
@@ -40,20 +41,14 @@ extension MQTTUtils{
             "lat": latitude,
             "lng": longitude,
             "deviceId": DeviceConfig.deviceId,
-            "subscribeTo":DeviceConfig.deviceUuid,
             "recordAt": formatter.string(from: Date())
         ]
         
-        let ip: String = NetworkUtils.getIPAddress() ?? ""
+        let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
+
+        // 發布到 topic
+        publishData(action: Action.RECORDING.rawValue, data: locationData, clientId: MQTTConfig.clientID, jwt: AuthManager.shared.getJWT()!, ip: ip)
         
-        // 轉換為 JSON 字串
-        if let jsonData = try? JSONSerialization.data(withJSONObject: locationData, options: []),
-           let jsonString = String(data: jsonData, encoding: .utf8) {
-            
-            // 發布到 topic
-            let topic = "req/device_recording/\(MQTTConfig.clientID)/\(jwt)/\(ip)"
-            publish(data: jsonString, to: topic)
-        }
     }
     
     struct RegisterData: Codable {
@@ -71,7 +66,7 @@ extension MQTTUtils{
             "firstName": firstname,
             "nickName": nickname,
         ]
-        let ip: String = NetworkUtils.getIPAddress() ?? ""
+        let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
         return await publishAndGetData(action: Action.REGISTER.rawValue,
                                           data: data,
                                           clientId: MQTTConfig.clientID,
@@ -104,12 +99,9 @@ extension MQTTUtils{
     }
     
     func publishSysStatusData() async -> MQTTResponse<CommonResponse<SysStatusData>>{
-        let data: [String: String] = [
-            "deviceId": DeviceConfig.deviceId,
-        ]
         let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
         return await publishAndGetData(action: Action.SYSTEM_STATUS.rawValue,
-                                       data: data,
+                                       data: [:],
                                        clientId: MQTTConfig.clientID,
                                        jwt: "",
                                        ip: ip)
@@ -117,44 +109,18 @@ extension MQTTUtils{
     
     struct DevStatusData: Codable{
         let lastSeen: String
-        let online: String
+        let online: Bool
     }
     
     func publishDevStatusData() async -> MQTTResponse<CommonResponse<DevStatusData>>{
+        let data: [String: String] = [
+            "deviceId": DeviceConfig.deviceId,
+        ]
         let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
         return await publishAndGetData(action: Action.DEVICE_STATUS.rawValue,
-                                       data: [:],
+                                       data: data,
                                        clientId: MQTTConfig.clientID,
                                        jwt: AuthManager.shared.getJWT()!,
                                        ip: ip)
-    }
-    
-    func publishAndGetData<T: Decodable>(
-        action: String,
-        data: [String: String],
-        clientId: String,
-        jwt: String,
-        ip: String
-    ) async -> MQTTResponse<CommonResponse<T>> {
-        
-        let topic = "req/\(action)/\(clientId)/\(jwt)/\(ip)"
-        
-        return await withCheckedContinuation { continuation in
-            var isCompleted = false
-            
-            publishAndWaitResponse(data: data, publishTopic: topic) { reply in
-                guard !isCompleted else { return }
-                isCompleted = true
-                continuation.resume(returning: reply)
-            }
-            
-            // 超時處理
-            Task {
-                try? await Task.sleep(nanoseconds: UInt64(MQTTConfig.timeout * 1_000_000_000))
-                guard !isCompleted else { return }
-                isCompleted = true
-                continuation.resume(returning: .timeout)
-            }
-        }
     }
 }

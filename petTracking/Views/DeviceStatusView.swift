@@ -47,14 +47,7 @@ final class DeviceStatusView: UIView {
         LastSeenLabel.text = "前次記錄時間: \n\(time)"
         LastSeenLabel.numberOfLines = 0 // 允許多行
     }
-    func updateStatus(isOnline: String) {
-        var online: Bool = false
-        if "true" == isOnline{
-            online = true
-        }
-        if "false" == isOnline{
-            online = false
-        }
+    func updateStatus(online: Bool) {
         StatusLabel.text = online ? "在線狀況: ✓" : "在線狀況: ᙮"
         StatusLabel.textColor = online ? .ptSecondary : .ptTertiary
     }

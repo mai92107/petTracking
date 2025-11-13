@@ -21,20 +21,68 @@ class MQTTUtils{
     static let shared = MQTTUtils()
     
     private init() {}  // 🔥 防止外部建立實例
-
-    func publish(data: String, to topic: String){
+    
+    func publishData(
+                     action: String,
+                     data: [String: Any],
+                     clientId: String,
+                     jwt: String,
+                     ip: String
+    ){
+        let topic = "req/\(action)/\(clientId)/\(jwt)/\(ip)"
+        publishAndNoResponse(data: data, to: topic)
+    }
+    
+    func publishAndGetData<T: Decodable>(
+        action: String,
+        data: [String: Any],
+        clientId: String,
+        jwt: String,
+        ip: String
+    ) async -> MQTTResponse<CommonResponse<T>> {
+        
+        let topic = "req/\(action)/\(clientId)/\(jwt)/\(ip)"
+        
+        return await withCheckedContinuation { continuation in
+            var isCompleted = false
+            
+            publishAndWaitResponse(data: data, publishTopic: topic) { reply in
+                guard !isCompleted else { return }
+                isCompleted = true
+                continuation.resume(returning: reply)
+            }
+            
+            // 超時處理
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(MQTTConfig.timeout * 1_000_000_000))
+                guard !isCompleted else { return }
+                isCompleted = true
+                continuation.resume(returning: .timeout)
+            }
+        }
+    }
+    
+    func publishAndNoResponse(data: [String:Any], to topic: String, qos: CocoaMQTTQoS = .qos1){
         guard let client = MQTTManager.shared.mqttClient, client.connState == .connected else {
-            print("MQTT 未連線,無法發送資料")
+            print("⚠️ MQTT 未連線,無法發送資料")
             return
         }
+        // 加入接收主題 及 錯誤訊息
+        let subscribeTopic = UUID().uuidString
+        var payload = data
+        payload["subscribeTo"] = subscribeTopic
         
-        client.publish(topic, withString: data, qos: MQTTConfig.qos)
-        
-        print("📤 已發送, 主題: \(topic), 內容: \(data)")
+        // 轉為json string
+        if let jsonData = try? JSONSerialization.data(withJSONObject: payload, options: []),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            // 3️⃣ 發佈訊息
+            client.publish(topic, withString: jsonString, qos: qos)
+            print("📤 發佈訊息到 \(topic): \(jsonString)")
+        }
     }
     
     func publishAndWaitResponse<T: Decodable>(
-          data: [String: String],
+          data: [String: Any],
           publishTopic: String,
           qos: CocoaMQTTQoS = .qos1,
           completion: @escaping (MQTTResponse<T>) -> Void
@@ -44,7 +92,7 @@ class MQTTUtils{
               return
           }
           
-          // 加入接收主題 及 錯誤訊息
+          // 加入接收主題
           let subscribeTopic = UUID().uuidString
           
           var payload = data

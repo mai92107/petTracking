@@ -20,7 +20,7 @@ class CommonAlertManager {
     
     func showNeedLoginAlert(
         on viewController: UIViewController, _ completion: @escaping()->Void ){
-            self.showMessage(on: viewController, title: "前往登入", message: "", onDismiss: completion)
+            self.showMessage(on: viewController, title: "裝置已登出", message: "", onDismiss: completion)
     }
     
     

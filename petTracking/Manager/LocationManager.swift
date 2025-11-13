@@ -22,7 +22,9 @@ class LocationManager: NSObject {
     weak var delegate: LocationManagerDelegate?
     
     static let shared = LocationManager()
-    
+    var isTracking = false
+    var lastKnownLocation: CLLocation?
+
     // 用於記錄用戶是否想要開始追蹤(用於權限請求後自動開始)
     private var shouldStartAfterAuthorization = false
     
@@ -82,6 +84,7 @@ extension LocationManager: CLLocationManagerDelegate {
             print("⚠️ 無效的定位數據")
             return
         }
+        lastKnownLocation = last
         let longitude = LocationUtil.shared.Get7NumberLocation(double: last.coordinate.longitude)
         let latitude = LocationUtil.shared.Get7NumberLocation(double: last.coordinate.latitude)
         delegate?.didUpdateLocation(lng: longitude, lat: latitude)

@@ -230,6 +230,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = petTracking/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "BunBun Tracker";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要存取本地網路以進行定位服務";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
@@ -263,6 +267,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = petTracking/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "BunBun Tracker";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要存取本地網路以進行定位服務";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";

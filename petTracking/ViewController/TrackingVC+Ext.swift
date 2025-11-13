@@ -16,7 +16,11 @@ final class TrackingVC: BaseVC {
     private let locationLabel = LocationView()
 
     // MARK: - Properties
-    private var isTracking = false
+    private var isTracking: Bool {
+        get { LocationManager.shared.isTracking }
+        set { LocationManager.shared.isTracking = newValue }
+    }
+    
     private var isConnected = MQTTManager.shared.isConnect
     
     // MARK: - View Entrence
@@ -29,6 +33,7 @@ final class TrackingVC: BaseVC {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         LocationManager.shared.checkAuthorizationStatus()
+        updateUIState()
     }
     
     // MARK: - Config
@@ -59,6 +64,20 @@ final class TrackingVC: BaseVC {
             locationLabel.heightAnchor.constraint(equalToConstant: 100)
 
         ])
+    }
+    
+    // 離開返回後畫面
+    private func updateUIState() {
+        if isTracking {
+            actionButton.setTitle("停止定位", for: .normal)
+            if let last = LocationManager.shared.lastKnownLocation {
+                locationLabel.updateLatitude(abs(last.coordinate.latitude))
+                locationLabel.updateLongitude(abs(last.coordinate.longitude))
+            }
+        } else {
+            actionButton.setTitle("開始定位", for: .normal)
+            locationLabel.resetLabels()
+        }
     }
 }
 

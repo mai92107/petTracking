@@ -93,6 +93,11 @@ extension TrackingVC: PtButtonDelegate{
             return
         }
         
+        if DeviceConfig.deviceId == ""{
+            showFailedMessageAlert(message: "非核可裝置，不可紀錄位置")
+            return
+        }
+        
         LocationManager.shared.requestAuthorizationAndStart()
         
         isTracking = true
@@ -111,8 +116,8 @@ extension TrackingVC: PtButtonDelegate{
 extension TrackingVC: LocationManagerDelegate {
     func didUpdateLocation(lng: Double, lat: Double) {
         print("📍 定位更新 - 緯度:\(lat), 經度:\(lng)")
-        updateLocationDisplay(latitude: lat, longitude: lng)
         sendLocationData(latitude: lat, longitude: lng)
+        updateLocationDisplay(latitude: lat, longitude: lng)
     }
     
     private func updateLocationDisplay(latitude: Double, longitude: Double) {
@@ -122,7 +127,8 @@ extension TrackingVC: LocationManagerDelegate {
     
     private func sendLocationData(latitude: Double, longitude: Double) {
         let jwt = AuthManager.shared.getJWT()!
-        MQTTUtils.shared.publishLocation(latitude: latitude, longitude: longitude, jwt: jwt)
+        guard let dataRef = LocationManager.shared.newRecordRef else { return }
+        MQTTUtils.shared.publishLocation(latitude: latitude, longitude: longitude, jwt: jwt, on: dataRef)
     }
     func didChangeAuthorization(status: CLAuthorizationStatus) {       
         switch status {

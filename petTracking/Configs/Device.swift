@@ -14,6 +14,6 @@ struct DeviceConfig {
     static let deviceId = "AA-000001"
     
     // 裝置唯一識別碼
-    static let deviceUuid = "c55a5e3c-7c97-424f-9051-496fbd89cb3f"
+//    static let deviceUuid = "c55a5e3c-7c97-424f-9051-496fbd89cb3f"
     
 }

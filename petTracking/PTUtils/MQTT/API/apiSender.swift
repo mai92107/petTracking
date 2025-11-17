@@ -31,7 +31,12 @@ struct EmptyResponse: Codable {}
 extension MQTTUtils{
     
     // 發布位置資料
-    func publishLocation(latitude: Double, longitude: Double, jwt: String) {
+    func publishLocation(latitude: Double, longitude: Double, jwt: String, on newRecord: String) {
+        
+//        guard let deviceId = AuthManager.shared.getDeviceId() else {
+//            return
+//        }
+        
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         formatter.timeZone = TimeZone.current
@@ -41,14 +46,14 @@ extension MQTTUtils{
             "lat": latitude,
             "lng": longitude,
             "deviceId": DeviceConfig.deviceId,
-            "recordAt": formatter.string(from: Date())
+            "recordAt": formatter.string(from: Date()),
+            "dataRef": newRecord,
         ]
         
         let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
 
         // 發布到 topic
         publishData(action: Action.RECORDING.rawValue, data: locationData, clientId: MQTTConfig.clientID, jwt: AuthManager.shared.getJWT()!, ip: ip)
-        
     }
     
     struct RegisterData: Codable {
@@ -76,8 +81,8 @@ extension MQTTUtils{
     
     struct LoginData: Codable {
         let token: String
-        let identity: String?
-        let loginTime: String?
+        let identity: String
+        let loginTime: String
     }
     
     func publishLoginData(username: String, password: String) async -> MQTTResponse<CommonResponse<LoginData>>{
@@ -112,9 +117,9 @@ extension MQTTUtils{
         let online: Bool
     }
     
-    func publishDevStatusData() async -> MQTTResponse<CommonResponse<DevStatusData>>{
+    func publishDevStatusData(deviceId: String) async -> MQTTResponse<CommonResponse<DevStatusData>>{
         let data: [String: String] = [
-            "deviceId": DeviceConfig.deviceId,
+            "deviceId": deviceId,
         ]
         let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
         return await publishAndGetData(action: Action.DEVICE_STATUS.rawValue,

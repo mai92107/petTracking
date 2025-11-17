@@ -14,16 +14,22 @@ final class DevStatusVC: BaseVC {
     private let titleLabel = PTLabel(text: "Device Status", with: .title)
     private let statusInfoLabel = DeviceStatusView()
     
+    private var isConnected = MQTTManager.shared.isConnect
+
+    
     // MARK: - View Entrence
     override func viewDidLoad() {
         super.viewDidLoad()
         setupConfig()
         setupUI()
-        getStatusInfo()
+        if isConnected{
+            getStatusInfo(device: DeviceConfig.deviceId)
+        }
     }
 
     // MARK: - Config
     private func setupConfig(){
+        MQTTManager.shared.delegate = self
     }
     
     // MARK: - Layout
@@ -45,10 +51,25 @@ final class DevStatusVC: BaseVC {
         ])
     }
     
+
+}
+
+extension DevStatusVC: MQTTManagerDelegate{
+    func mqttStatusChanged(isConnected: Bool) {
+        if isConnected {
+            getStatusInfo(device: DeviceConfig.deviceId)
+        }else{
+            statusInfoLabel.updateStatus(online: false)
+        }
+    }
     
-    private func getStatusInfo(){
+    func mqttMsgGet(topic: String, message: String) {
+    }
+    
+    // TODO: 當為ADMIN時 跳出選擇裝置的匡
+    private func getStatusInfo(device: String){
         Task { @MainActor in
-            let response = await MQTTUtils.shared.publishDevStatusData()
+            let response = await MQTTUtils.shared.publishDevStatusData(deviceId: device)
 
             switch response {
             case .success(let msg):
@@ -65,13 +86,10 @@ final class DevStatusVC: BaseVC {
                 print("rawResponse: " + msg)
             }
         }
-        
-//        statusInfoLabel.updateLastSeenLabel(time: "2025-11-12 12:21:55")
-//        statusInfoLabel.updateStatus(isOnline: "true")
     }
 }
 
 
-#Preview{
-    DevStatusVC()
-}
+//#Preview{
+//    DevStatusVC()
+//}

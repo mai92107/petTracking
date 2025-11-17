@@ -100,7 +100,9 @@ extension LoginVC: PtButtonDelegate {
             case .success(let msg):
                 print("登入成功")
                 let jwt = msg.data.token
+                let role = msg.data.identity
                 AuthManager.shared.setJwt(jwt)
+                AuthManager.shared.setRole(role)
 
             case .failure(let errorMsg):
                 // 自動彈出後端錯誤訊息！

@@ -18,6 +18,7 @@ final class HomeVCAuth: BaseVC{
         super.viewDidLoad()
         setupConfig()
         setupLayout()
+        applyPermission()
     }
     
     func setupConfig(){
@@ -28,7 +29,7 @@ final class HomeVCAuth: BaseVC{
     }
     
     func setupLayout(){
-        let buttons = PTVerticalStackView(in: 20, views: [gotoTrackingButton, gotoDeviceStatusButton,gotoSystemStatusButton, gotoLogoutButton])
+        var buttons = PTVerticalStackView(in: 20, views: [gotoTrackingButton, gotoDeviceStatusButton,gotoSystemStatusButton, gotoLogoutButton])
         
         view.backgroundColor = .ptQuaternary
         
@@ -41,6 +42,11 @@ final class HomeVCAuth: BaseVC{
             buttons.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
             buttons.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 200)
         ])
+    }
+    
+    func applyPermission(){
+        var isAdmin = AuthManager.shared.isAdmin()
+        gotoTrackingButton.isHidden = isAdmin
     }
 }
 

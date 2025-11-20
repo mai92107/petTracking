@@ -7,6 +7,8 @@
 
 
 import UIKit
+import LocalAuthentication
+
 
 final class LoginVC: BaseVC {
     
@@ -26,6 +28,8 @@ final class LoginVC: BaseVC {
         super.viewDidLoad()
         setupConfig()
         setupLayout()
+        
+        authenticateWithBiometrics()
 
     }
     
@@ -66,6 +70,65 @@ final class LoginVC: BaseVC {
     }
 }
 
+extension LoginVC{
+    private func authenticateWithBiometrics() {
+        let context = LAContext()
+        var error: NSError?
+        
+        // 檢查Keychain是否已經有帳號密碼
+        if KeychainHelper.shared.get("username") == nil || KeychainHelper.shared.get("password") == nil{
+            return
+        }
+
+        // 檢查裝置是否支援生物辨識
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            let reason = "請使用 Face ID / Touch ID 登入"
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { [weak self] success, authError in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    if success {
+                        print("生物辨識登入成功")
+                        if let username = KeychainHelper.shared.get("username"),
+                           let password = KeychainHelper.shared.get("password") {
+                            self.login(username: username, password: password)
+                        }
+                    } else {
+                        let message = authError?.localizedDescription ?? "登入失敗"
+                        self.showMessageAlert(title: "驗證失敗", message: message)
+                    }
+                }
+            }
+        } else {
+            let message = error?.localizedDescription ?? "裝置不支援生物辨識"
+            showMessageAlert(title: "錯誤", message: message)
+        }
+    }
+    
+    private func login(username: String, password: String) {
+        Task { @MainActor in
+            let response = await MQTTUtils.shared.publishLoginData(username: username, password: password)
+
+            switch response {
+            case .success(let msg):
+                print("登入成功")
+                let jwt = msg.data.token
+                let role = msg.data.identity
+                AuthManager.shared.setJwt(jwt)
+                AuthManager.shared.setRole(role)
+                // 可選：導向主頁
+            case .failure(let errorMsg):
+                showMessageAlert(title: "登入失敗", message: errorMsg.message)
+            case .timeout:
+                showMessageAlert(title: "連線逾時", message: "請檢查網路後重試")
+            case .rawResponse(let msg):
+                print("rawResponse: " + msg)
+            }
+        }
+    }
+
+
+}
+
 extension LoginVC: PTLabelDegate{
     func goto() {
         if let nav = navigationController {
@@ -90,31 +153,19 @@ extension LoginVC: UITextFieldDelegate{
 
 extension LoginVC: PtButtonDelegate {
     func onClick(_ sender: PTButton) {
-        let username = accountTextField.text ?? ""
-        let password = passwordTextField.text ?? ""
-
-        Task { @MainActor in
-            let response = await MQTTUtils.shared.publishLoginData(username: username, password: password)
-
-            switch response {
-            case .success(let msg):
-                print("登入成功")
-                let jwt = msg.data.token
-                let role = msg.data.identity
-                AuthManager.shared.setJwt(jwt)
-                AuthManager.shared.setRole(role)
-
-            case .failure(let errorMsg):
-                // 自動彈出後端錯誤訊息！
-                showMessageAlert(title: "登入失敗", message: errorMsg.message)
-
-            case .timeout:
-                showMessageAlert(title: "連線逾時", message: "請檢查網路後重試"
-                )
-            case .rawResponse(let msg):
-                print("rawResponse: " + msg)
-            }
+        guard let username = accountTextField.text else {
+            showMessageAlert(title: "請輸入使用者帳戶", message: "")
+            return
         }
+        guard let password = passwordTextField.text else {
+            showMessageAlert(title: "請輸入密碼", message: "")
+            return
+        }
+                
+        KeychainHelper.shared.save("username", value: username)
+        KeychainHelper.shared.save("password", value: password)
+        
+        login(username: username, password: password)
     }
 }
 //

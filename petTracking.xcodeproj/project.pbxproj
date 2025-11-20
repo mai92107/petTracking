@@ -230,6 +230,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = petTracking/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "BunBun Tracker";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "App 需要使用 Face ID 以協助您快速安全地登入。";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要存取本地網路以進行定位服務";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
@@ -267,6 +268,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = petTracking/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "BunBun Tracker";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "App 需要使用 Face ID 以協助您快速安全地登入。";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要存取本地網路以進行定位服務";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";

@@ -9,10 +9,40 @@
 /* Begin PBXBuildFile section */
 		4E1B885247C38F26A5AAA672 /* Pods_petTracking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A023DAE0C071298F518ABF6 /* Pods_petTracking.framework */; };
 		58B7C00D2EB2FDD30094468A /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 58B7C00C2EB2FDC30094468A /* Podfile */; };
+		58B7C3E52ECF08690094468A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B7C3E42ECF08680094468A /* WidgetKit.framework */; };
+		58B7C3E72ECF08690094468A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B7C3E62ECF08690094468A /* SwiftUI.framework */; };
+		58B7C3F82ECF086A0094468A /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 58B7C3E32ECF08680094468A /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		58B7C3F62ECF086A0094468A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E1F8D23F2EA907FA008CE84F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 58B7C3E22ECF08680094468A;
+			remoteInfo = widgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		58B7C3FD2ECF086A0094468A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				58B7C3F82ECF086A0094468A /* widgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		58B7C00C2EB2FDC30094468A /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
+		58B7C3E32ECF08680094468A /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		58B7C3E42ECF08680094468A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		58B7C3E62ECF08690094468A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		5A023DAE0C071298F518ABF6 /* Pods_petTracking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_petTracking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD995E18CF9F3E9E11A5D829 /* Pods-petTracking.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-petTracking.release.xcconfig"; path = "Target Support Files/Pods-petTracking/Pods-petTracking.release.xcconfig"; sourceTree = "<group>"; };
 		E19749207ADDF9ABA8AA0BC7 /* Pods-petTracking.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-petTracking.debug.xcconfig"; path = "Target Support Files/Pods-petTracking/Pods-petTracking.debug.xcconfig"; sourceTree = "<group>"; };
@@ -20,6 +50,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		58B7C3FC2ECF086A0094468A /* Exceptions for "widget" folder in "widgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 58B7C3E22ECF08680094468A /* widgetExtension */;
+		};
+		58B7C3FE2ECF0A0D0094468A /* Exceptions for "widget" folder in "petTracking" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				TrackingLiveActivity.swift,
+			);
+			target = E1F8D2462EA907FA008CE84F /* petTracking */;
+		};
 		E1F8D26F2EA907FD008CE84F /* Exceptions for "petTracking" folder in "petTracking" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -30,6 +74,15 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		58B7C3E82ECF08690094468A /* widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				58B7C3FE2ECF0A0D0094468A /* Exceptions for "widget" folder in "petTracking" target */,
+				58B7C3FC2ECF086A0094468A /* Exceptions for "widget" folder in "widgetExtension" target */,
+			);
+			path = widget;
+			sourceTree = "<group>";
+		};
 		E1F8D2492EA907FA008CE84F /* petTracking */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -41,6 +94,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		58B7C3E02ECF08680094468A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				58B7C3E72ECF08690094468A /* SwiftUI.framework in Frameworks */,
+				58B7C3E52ECF08690094468A /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E1F8D2442EA907FA008CE84F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -56,6 +118,8 @@
 			isa = PBXGroup;
 			children = (
 				5A023DAE0C071298F518ABF6 /* Pods_petTracking.framework */,
+				58B7C3E42ECF08680094468A /* WidgetKit.framework */,
+				58B7C3E62ECF08690094468A /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -73,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				E1F8D2492EA907FA008CE84F /* petTracking */,
+				58B7C3E82ECF08690094468A /* widget */,
 				E1F8D2482EA907FA008CE84F /* Products */,
 				58B7C00C2EB2FDC30094468A /* Podfile */,
 				B1E30BD843FCE9CD07BB13DA /* Pods */,
@@ -84,6 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				E1F8D2472EA907FA008CE84F /* petTracking.app */,
+				58B7C3E32ECF08680094468A /* widgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -91,6 +157,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		58B7C3E22ECF08680094468A /* widgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 58B7C3F92ECF086A0094468A /* Build configuration list for PBXNativeTarget "widgetExtension" */;
+			buildPhases = (
+				58B7C3DF2ECF08680094468A /* Sources */,
+				58B7C3E02ECF08680094468A /* Frameworks */,
+				58B7C3E12ECF08680094468A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				58B7C3E82ECF08690094468A /* widget */,
+			);
+			name = widgetExtension;
+			packageProductDependencies = (
+			);
+			productName = widgetExtension;
+			productReference = 58B7C3E32ECF08680094468A /* widgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		E1F8D2462EA907FA008CE84F /* petTracking */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E1F8D2702EA907FD008CE84F /* Build configuration list for PBXNativeTarget "petTracking" */;
@@ -100,10 +188,12 @@
 				E1F8D2442EA907FA008CE84F /* Frameworks */,
 				E1F8D2452EA907FA008CE84F /* Resources */,
 				5B529643FFE62BA90F66E7A7 /* [CP] Embed Pods Frameworks */,
+				58B7C3FD2ECF086A0094468A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				58B7C3F72ECF086A0094468A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E1F8D2492EA907FA008CE84F /* petTracking */,
@@ -120,9 +210,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					58B7C3E22ECF08680094468A = {
+						CreatedOnToolsVersion = 16.3;
+					};
 					E1F8D2462EA907FA008CE84F = {
 						CreatedOnToolsVersion = 16.2;
 						LastSwiftMigration = 1630;
@@ -144,11 +237,19 @@
 			projectRoot = "";
 			targets = (
 				E1F8D2462EA907FA008CE84F /* petTracking */,
+				58B7C3E22ECF08680094468A /* widgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		58B7C3E12ECF08680094468A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E1F8D2452EA907FA008CE84F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -206,6 +307,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		58B7C3DF2ECF08680094468A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E1F8D2432EA907FA008CE84F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -215,7 +323,71 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		58B7C3F72ECF086A0094468A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 58B7C3E22ECF08680094468A /* widgetExtension */;
+			targetProxy = 58B7C3F62ECF086A0094468A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		58B7C3FA2ECF086A0094468A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GG9SNK5Y77;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = widget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rafa.petTracking.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		58B7C3FB2ECF086A0094468A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GG9SNK5Y77;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = widget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rafa.petTracking.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		E1F8D2712EA907FD008CE84F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E19749207ADDF9ABA8AA0BC7 /* Pods-petTracking.debug.xcconfig */;
@@ -235,6 +407,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
@@ -273,6 +446,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "App 需要在使用時存取您的位置以追蹤寵物。";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
@@ -413,6 +587,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		58B7C3F92ECF086A0094468A /* Build configuration list for PBXNativeTarget "widgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				58B7C3FA2ECF086A0094468A /* Debug */,
+				58B7C3FB2ECF086A0094468A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E1F8D2422EA907FA008CE84F /* Build configuration list for PBXProject "petTracking" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -18,49 +18,49 @@ class LocationManager: NSObject {
     // MARK: - Properties
     private let locationManager = CLLocationManager()
     weak var delegate: LocationManagerDelegate?
+    var lastKnownLocation: CLLocation?
     
     static let shared = LocationManager()
     
-    // 追蹤狀態
     var isTracking = false
-    var lastKnownLocation: CLLocation?
     var newRecordRef: String?
     
-    // 用於權限請求後自動開始
     private var shouldStartAfterAuthorization = false
     
-    private let minDistance: CLLocationDistance = 5.0           // 至少移動 5 公尺
-    private let maxTimeInterval: TimeInterval = 30.0            // 最多間隔 30 秒
-    private var lastSentTime: Date = .distantPast               // 上次真正發送的時間
+    private let minDistance: CLLocationDistance = 10.0      // 至少移動 10 公尺
+    private let maxTimeInterval: TimeInterval = 20.0        // 最多 20 秒
+    
+    private var lastSentTime: Date?
+    private var lastSentLocation: CLLocation?
+    private var pendingLocation: CLLocation?
     
     // MARK: - Init
     override private init() {
         super.init()
+        setupConfig()
+    }
+    
+    // MARK: - Config
+    private func setupConfig() {
         locationManager.delegate = self
-        
-        // 調整為更省電但仍精準的設定
         locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-        locationManager.distanceFilter = 3.0                       // 先用 3m 讓系統先過濾垃圾點
-        locationManager.pausesLocationUpdatesAutomatically = true  // 允許系統在靜止時自動暫停（省電！）
-        locationManager.activityType = .otherNavigation            // 適合寵物追蹤的類型
+        locationManager.pausesLocationUpdatesAutomatically = true
+        locationManager.activityType = .otherNavigation
         locationManager.allowsBackgroundLocationUpdates = true
     }
     
     // MARK: - Authorization
     func requestAuthorizationAndStart() {
-        let status = locationManager.authorizationStatus
-        switch status {
+        switch locationManager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
             startUpdatingLocation()
-        case .denied, .restricted:
-            print("❌ 定位權限被拒絕或受限")
-            delegate?.didChangeAuthorization(status: status)
+        case .denied, .restricted: print("❌ 定位權限被拒絕或受限")
+            delegate?.didChangeAuthorization(status: locationManager.authorizationStatus)
         case .notDetermined:
             shouldStartAfterAuthorization = true
             locationManager.requestAlwaysAuthorization()
             print("🔐 請求「永遠」定位權限")
-        @unknown default:
-            break
+        @unknown default: break
         }
     }
     
@@ -68,21 +68,45 @@ class LocationManager: NSObject {
         delegate?.didChangeAuthorization(status: locationManager.authorizationStatus)
     }
     
-    // MARK: - Tracking Controls
+    // MARK: - Tracking
     func startUpdatingLocation() {
         guard !isTracking else { return }
-        print("📍 開始追蹤位置")
         isTracking = true
         newRecordRef = UUID().uuidString
+        
+        lastSentTime = nil
+        lastSentLocation = nil
+        
         locationManager.startUpdatingLocation()
     }
     
     func stopUpdatingLocation() {
         guard isTracking else { return }
-        print("📍 停止追蹤位置")
         isTracking = false
         newRecordRef = nil
+        
         locationManager.stopUpdatingLocation()
+    }
+    
+    private func sendLocation(_ location: CLLocation) {
+        let now = Date()
+        
+        let distance = lastSentLocation?.distance(from: location) ?? 0.0
+        let timeInterval = lastSentTime.map { now.timeIntervalSince($0) } ?? maxTimeInterval
+                
+        guard distance >= minDistance || timeInterval >= maxTimeInterval else { return }
+
+        // 更新紀錄
+        lastKnownLocation = location
+        lastSentLocation = location
+        lastSentTime = now
+
+        let lng = LocationUtil.shared.Get7NumberLocation(double: location.coordinate.longitude)
+        let lat = LocationUtil.shared.Get7NumberLocation(double: location.coordinate.latitude)
+        
+        print("✅ 發送定位 | 距離: \(String(format: "%.1f", distance))m | 時間間隔: \(String(format: "%.1f", timeInterval))s")
+        delegate?.didUpdateLocation(lng: lng, lat: lat)
+        
     }
 }
 
@@ -90,35 +114,11 @@ class LocationManager: NSObject {
 extension LocationManager: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last,
-              location.horizontalAccuracy >= 0 else {
-            print("⚠️ 無效的定位數據")
-            return
-        }
+        guard let location = locations.last, location.horizontalAccuracy >= 0 else { return }
         
-        let now = Date()
-        let timeIntervalSinceLastSend = now.timeIntervalSince(lastSentTime)
-        
-        // 計算與上次「真正發送」的位置距離
-        let distanceFromLastSent = lastKnownLocation?.distance(from: location) ?? Double.greatestFiniteMagnitude
-        
-        // 雙條件判斷：滿足「距離」或「時間」任一條件就發送
-        let shouldSend = distanceFromLastSent >= minDistance || timeIntervalSinceLastSend >= maxTimeInterval
-        
-        if shouldSend {
-            lastKnownLocation = location
-            lastSentTime = now
-            
-            let lng = LocationUtil.shared.Get7NumberLocation(double: location.coordinate.longitude)
-            let lat = LocationUtil.shared.Get7NumberLocation(double: location.coordinate.latitude)
-            
-            print("✅ 發送定位 | 距離: \(String(format: "%.1f", distanceFromLastSent))m | 時間間隔: \(String(format: "%.1f", timeIntervalSinceLastSend))s")
-            delegate?.didUpdateLocation(lng: lng, lat: lat)
-            lastSentTime = .distantPast
-        } else {
-            // 可選：靜音記錄被過濾的點（除錯用）
-             print("filtered location | 距離: \(String(format: "%.1f", distanceFromLastSent))m | 剩 \(String(format: "%.1f", maxTimeInterval - timeIntervalSinceLastSend))s")
-        }
+        // 每次更新時先存起來，實際發送由 Timer 或距離判斷決定
+        pendingLocation = location
+        sendLocation(location)
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -127,17 +127,12 @@ extension LocationManager: CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
-        print("📍 權限變更: \(status.rawValue)")
         delegate?.didChangeAuthorization(status: status)
         
         if shouldStartAfterAuthorization {
-            switch status {
-            case .authorizedWhenInUse, .authorizedAlways:
+            if status == .authorizedAlways || status == .authorizedWhenInUse{
                 shouldStartAfterAuthorization = false
                 startUpdatingLocation()
-            case .denied, .restricted:
-                shouldStartAfterAuthorization = false
-            default: break
             }
         }
     }

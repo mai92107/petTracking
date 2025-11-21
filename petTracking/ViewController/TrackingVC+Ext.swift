@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreLocation
+import ActivityKit
 
 final class TrackingVC: BaseVC {
     
@@ -14,6 +15,9 @@ final class TrackingVC: BaseVC {
     private let titleLabel = PTLabel(text: "Pet Tracking System", with: .title)
     private let actionButton = PTButton(title: "開始定位", Vpadding: 15, Hpadding: 40)
     private let locationLabel = LocationView()
+    
+    private var timer: Timer?
+    private var seconds = 0
 
     // MARK: - Properties
     private var isTracking: Bool {
@@ -92,14 +96,25 @@ extension TrackingVC: PtButtonDelegate{
             showFailedMessageAlert(message: "MQTT 未連線，訊息無法送出\n請稍後嘗試")
             return
         }
-        
-        if DeviceConfig.deviceId == ""{
+
+        if DeviceConfig.deviceId == "" {
             showFailedMessageAlert(message: "非核可裝置，不可紀錄位置")
             return
         }
-        
+
         LocationManager.shared.requestAuthorizationAndStart()
-        
+
+        // ⭐ 啟動 Dynamic Island
+        TrackingManager.shared.start(deviceName: "Pet Tracker")
+
+        // ⭐ 啟動秒數 Timer
+        seconds = 0
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            self.seconds += 1
+            TrackingManager.shared.update(seconds: self.seconds)
+        }
+
         isTracking = true
         actionButton.setTitle("停止定位", for: .normal)
     }
@@ -109,6 +124,10 @@ extension TrackingVC: PtButtonDelegate{
         isTracking = false
         actionButton.setTitle("開始定位", for: .normal)
         locationLabel.resetLabels()
+
+        // ⭐ 停止 Timer + Live Activity
+        timer?.invalidate()
+        TrackingManager.shared.stop()
     }
 }
 
@@ -126,13 +145,14 @@ extension TrackingVC: LocationManagerDelegate {
     }
     
     private func sendLocationData(latitude: Double, longitude: Double) {
-        let jwt = AuthManager.shared.getJWT()!
+        guard let jwt = AuthManager.shared.getJWT() else { return }
         guard let dataRef = LocationManager.shared.newRecordRef else { return }
         MQTTUtils.shared.publishLocation(latitude: latitude, longitude: longitude, jwt: jwt, on: dataRef)
     }
-    func didChangeAuthorization(status: CLAuthorizationStatus) {       
+    
+    func didChangeAuthorization(status: CLAuthorizationStatus) {
         switch status {
-        case .denied, .restricted:
+        case .denied:
             if isTracking {
                 stopTracking()
                 showPermissionDeniedAlert()
@@ -161,4 +181,10 @@ extension TrackingVC: LocationManagerDelegate {
         alert.addAction(UIAlertAction(title: "取消", style: .cancel))
         present(alert, animated: true)
     }
+}
+
+extension TrackingVC{
+
+
+
 }

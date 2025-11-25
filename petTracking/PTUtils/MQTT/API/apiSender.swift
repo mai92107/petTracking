@@ -143,7 +143,7 @@ extension MQTTUtils{
 
 
     struct TripHistories: Codable{
-        let page: PageInfo
+        let pageInfo: PageInfo
         let trips: [TripModel]
     }
     

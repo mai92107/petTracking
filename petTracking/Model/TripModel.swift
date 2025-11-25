@@ -7,6 +7,7 @@
 
 struct TripModel: Codable {
     let uuid: String
-    let distance: Double
-    let duration: Double
+    let time: String
+    let distance: String
+    let duration: String
 }

@@ -60,7 +60,7 @@ extension TripVC: PTCollectionViewDelegate{
     func configureCell(cell: UICollectionViewCell, indexPath: IndexPath) {
         let cell = cell as! TripViewCell
         let model = trips[indexPath.item]
-        cell.configure(/*time: model.time,*/ distance: model.distance, duration: model.duration)
+        cell.configure(time: model.time, distance: model.distance, duration: model.duration)
     }
 }
 
@@ -76,7 +76,7 @@ extension TripVC{
             
             switch response {
             case .success(let msg):
-                let pageInfo = msg.data.page      // 📌 取得分頁資訊
+                let pageInfo = msg.data.pageInfo      // 📌 取得分頁資訊
                 let tripList = msg.data.trips     // 📌 取得紀錄清單
 
                 self.trips = tripList

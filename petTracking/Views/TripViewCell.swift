@@ -33,17 +33,15 @@ class TripViewCell: UICollectionViewCell {
         contentView.layer.masksToBounds = true
     }
     
-//    func configure(time: String, distance: String, duration: String) {
-//        tripInfo.text = "紀錄時間: \(time)   距離: \(distance)   耗時: \(duration)"
-//    }
-    func configure(distance: Double, duration: Double) {
-        tripInfo.text = "距離: \(distance) KM   耗時: \(duration) MIN"
+
+    func configure(time: String, distance: String, duration: String) {
+        tripInfo.text = "\(time) - \(distance)km - \(duration)min"
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
-#Preview{
-    TripViewCell()
-}
+//#Preview{
+//    HomeVCAuth()
+//}

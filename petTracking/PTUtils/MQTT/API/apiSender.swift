@@ -17,6 +17,9 @@ enum Action: String {
     case SYSTEM_STATUS = "system_status"
     case ADD_DEVICE = "member_addDevice"
     case DEVICE_STATUS = "device_status"
+    case TRIP_HISTORY = "trips"
+    case TRIP_DETAIL = "trip"
+
 }
 
 struct CommonResponse<T: Codable>: Decodable {
@@ -26,6 +29,14 @@ struct CommonResponse<T: Codable>: Decodable {
     let requestedTime: String?
     let respondedTime: String?
 }
+
+struct PageInfo: Codable{
+    let page: Int64
+    let size: Int64
+    let total: Int64
+    let totalPages: Int64
+}
+
 struct EmptyResponse: Codable {}
 
 extension MQTTUtils{
@@ -128,4 +139,26 @@ extension MQTTUtils{
                                        jwt: AuthManager.shared.getJWT()!,
                                        ip: ip)
     }
-}
+    
+
+
+    struct TripHistories: Codable{
+        let page: PageInfo
+        let trips: [TripModel]
+    }
+    
+    func publishTripHistory(deviceId: String, orderBy: String, direction: String, page: Int64, size: Int64) async -> MQTTResponse<CommonResponse<TripHistories>>{
+        let data: [String: Any] = [
+            "deviceId": deviceId,
+            "page": page,
+            "size": size,
+            "direction": direction,
+            "orderBy": orderBy
+        ]
+        let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
+        return await publishAndGetData(action: Action.TRIP_HISTORY.rawValue,
+                                       data: data,
+                                       clientId: MQTTConfig.clientID,
+                                       jwt: AuthManager.shared.getJWT()!,
+                                       ip: ip)
+    }}

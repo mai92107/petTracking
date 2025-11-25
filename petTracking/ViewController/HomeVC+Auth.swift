@@ -10,6 +10,7 @@ import UIKit
 final class HomeVCAuth: BaseVC{
     
     private let gotoTrackingButton = PTButton(title: "裝置定位", Vpadding: 15, Hpadding: 20)
+    private let gotoTripButton = PTButton(title: "歷史定位", Vpadding: 15, Hpadding: 20)
     private let gotoDeviceStatusButton = PTButton(title: "裝置狀態", Vpadding: 15, Hpadding: 20)
     private let gotoSystemStatusButton = PTButton(title: "系統狀態", Vpadding: 15, Hpadding: 20)
     private let gotoLogoutButton = PTButton(title: "登出裝置", Vpadding: 15, Hpadding: 20)
@@ -23,13 +24,14 @@ final class HomeVCAuth: BaseVC{
     
     func setupConfig(){
         gotoTrackingButton.ptDelegate = self
+        gotoTripButton.ptDelegate = self
         gotoDeviceStatusButton.ptDelegate = self
         gotoSystemStatusButton.ptDelegate = self
         gotoLogoutButton.ptDelegate = self
     }
     
     func setupLayout(){
-        var buttons = PTVerticalStackView(in: 20, views: [gotoTrackingButton, gotoDeviceStatusButton,gotoSystemStatusButton, gotoLogoutButton])
+        let buttons = PTVerticalStackView(in: 20, views: [gotoTrackingButton, gotoTripButton, gotoDeviceStatusButton, gotoSystemStatusButton, gotoLogoutButton])
         
         view.backgroundColor = .ptQuaternary
         
@@ -45,7 +47,7 @@ final class HomeVCAuth: BaseVC{
     }
     
     func applyPermission(){
-        var isAdmin = AuthManager.shared.isAdmin()
+        let isAdmin = AuthManager.shared.isAdmin()
         gotoTrackingButton.isHidden = isAdmin
     }
 }
@@ -57,6 +59,12 @@ extension HomeVCAuth: PtButtonDelegate{
             print("tracking button tapped")
             if let nav = navigationController {
                 nav.pushViewController(TrackingVC(), animated: true)
+            }
+            
+        case gotoTripButton:
+            print("trip button tapped")
+            if let nav = navigationController {
+                nav.pushViewController(TripVC(), animated: true)
             }
             
         case gotoDeviceStatusButton:

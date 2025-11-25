@@ -182,9 +182,3 @@ extension TrackingVC: LocationManagerDelegate {
         present(alert, animated: true)
     }
 }
-
-extension TrackingVC{
-
-
-
-}

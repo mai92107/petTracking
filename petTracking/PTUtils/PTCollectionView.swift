@@ -6,8 +6,9 @@
 //
 import UIKit
 
-protocol PTCollectionViewDelegate: AnyObject {
+protocol PTCollectionViewDelegate: UICollectionViewDelegate {
     func configureCell(cell: UICollectionViewCell, indexPath: IndexPath)
+    func scrollViewDidScroll(_ scrollView: UIScrollView)
 }
 class PTCollectionView: UIView {
 
@@ -23,7 +24,7 @@ class PTCollectionView: UIView {
 
     init(cellType: UICollectionViewCell.Type,
          reuseId: String = "PTCell",
-         itemSize: CGSize = CGSize(width: UIScreen.main.bounds.width - 40, height: 40))
+         itemSize: CGSize = CGSize(width: UIScreen.main.bounds.width - 40, height: 60))
     {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = itemSize
@@ -43,10 +44,10 @@ class PTCollectionView: UIView {
     private func setupConfig() {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
-        collectionView.delegate = self
         collectionView.dataSource = self
 
         collectionView.register(cellType, forCellWithReuseIdentifier: reuseId)
+        collectionView.delegate = ptCollectionDelegate
     }
 
     private func setupUI() {
@@ -75,5 +76,3 @@ extension PTCollectionView: UICollectionViewDataSource {
         return cell
     }
 }
-
-extension PTCollectionView: UICollectionViewDelegate {}

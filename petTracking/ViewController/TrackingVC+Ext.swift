@@ -90,45 +90,6 @@ extension TrackingVC: PtButtonDelegate{
     func onClick(_ sender: PTButton) {
         isTracking ? stopTracking() : startTracking()
     }
-    
-    private func startTracking() {
-        if !MQTTManager.shared.isConnect {
-            showFailedMessageAlert(message: "MQTT 未連線，訊息無法送出\n請稍後嘗試")
-            return
-        }
-
-        if DeviceConfig.deviceId == "" {
-            showFailedMessageAlert(message: "非核可裝置，不可紀錄位置")
-            return
-        }
-
-        LocationManager.shared.requestAuthorizationAndStart()
-
-        // ⭐ 啟動 Dynamic Island
-        TrackingManager.shared.start(deviceName: "Pet Tracker")
-
-        // ⭐ 啟動秒數 Timer
-        seconds = 0
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            self.seconds += 1
-            TrackingManager.shared.update(seconds: self.seconds)
-        }
-
-        isTracking = true
-        actionButton.setTitle("停止定位", for: .normal)
-    }
-    
-    private func stopTracking() {
-        LocationManager.shared.stopUpdatingLocation()
-        isTracking = false
-        actionButton.setTitle("開始定位", for: .normal)
-        locationLabel.resetLabels()
-
-        // ⭐ 停止 Timer + Live Activity
-        timer?.invalidate()
-        TrackingManager.shared.stop()
-    }
 }
 
 // MARK: - LocationManagerDelegate
@@ -147,14 +108,14 @@ extension TrackingVC: LocationManagerDelegate {
     private func sendLocationData(latitude: Double, longitude: Double) {
         guard let jwt = AuthManager.shared.getJWT() else { return }
         guard let dataRef = LocationManager.shared.newRecordRef else { return }
-        MQTTUtils.shared.publishLocation(latitude: latitude, longitude: longitude, jwt: jwt, on: dataRef)
+        sendRecordingData(lat: latitude, lng: longitude, jwt: jwt, on: dataRef)
     }
     
     func didChangeAuthorization(status: CLAuthorizationStatus) {
         switch status {
         case .denied:
             if isTracking {
-                stopTracking()
+                resetTracker()
                 showPermissionDeniedAlert()
             }
         default:
@@ -180,5 +141,94 @@ extension TrackingVC: LocationManagerDelegate {
         })
         alert.addAction(UIAlertAction(title: "取消", style: .cancel))
         present(alert, animated: true)
+    }
+}
+
+extension TrackingVC{
+    private func startTracking() {
+        if !MQTTManager.shared.isConnect {
+            showFailedMessageAlert(message: "MQTT 未連線，訊息無法送出\n請稍後嘗試")
+            return
+        }
+        if DeviceConfig.deviceId == "" {
+            showFailedMessageAlert(message: "非核可裝置，不可紀錄位置")
+            return
+        }
+        
+        LocationManager.shared.requestAuthorizationAndStart()
+        isTracking = true
+        
+        actionButton.setTitle("停止定位", for: .normal)
+    }
+    
+    private func stopTracking() {
+        guard let jwt = AuthManager.shared.getJWT() else { return }
+        guard let dataRef = LocationManager.shared.newRecordRef else { return }
+        sendFinalData(jwt: jwt, on: dataRef)
+        resetTracker()
+    }
+    private func resetTracker(){
+        LocationManager.shared.stopUpdatingLocation()
+        isTracking = false
+        actionButton.setTitle("開始定位", for: .normal)
+        locationLabel.resetLabels()
+    }
+    // ⭐ 啟動 Dynamic Island
+    func startDynamicIsland(){
+        TrackingManager.shared.start(deviceName: "Pet Tracker")
+        // 啟動秒數 Timer
+        seconds = 0
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            self.seconds += 1
+            TrackingManager.shared.update(seconds: self.seconds)
+        }
+    }
+    // ⭐ 停止 Timer + Live Activity
+    func stopDynamicIsland(){
+        timer?.invalidate()
+        TrackingManager.shared.stop()
+    }
+    
+    func sendRecordingData(lat: Double, lng: Double, jwt: String, on dataRef: String){
+        Task { @MainActor in
+            let response = await MQTTUtils.shared.publishLocation(latitude: lat, longitude: lng, jwt: jwt, on: dataRef, isFinal: false)
+
+            switch response {
+            case .success(_):
+                print("success")
+            case .failure(let errorMsg):
+                // 自動彈出後端錯誤訊息！
+                showMessageAlert(title: "定位發送失敗", message: errorMsg.message)
+                resetTracker()
+            case .rawResponse(let msg):
+                print("rawResponse: " + msg)
+            default:
+                break
+            }
+        }
+    }
+    
+    func sendFinalData(jwt: String, on dataRef: String){
+        print("收到結束通知")
+        Task { @MainActor in
+            let response = await MQTTUtils.shared.publishLocation(latitude: 0, longitude: 0, jwt: jwt, on: dataRef, isFinal: true)
+
+            switch response {
+            case .success(let msg):
+                print(msg.data!)
+            case .failure(let errorMsg):
+                // 自動彈出後端錯誤訊息！
+                showMessageAlert(title: "結束定位發送失敗", message: errorMsg.message)
+                resetTracker()
+
+            case .timeout:
+                showMessageAlert(title: "連線逾時", message: "請檢查網路後重試")
+                resetTracker()
+
+            case .rawResponse(let msg):
+                print("rawResponse: " + msg)
+            }
+        }
     }
 }

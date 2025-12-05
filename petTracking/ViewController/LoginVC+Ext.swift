@@ -111,8 +111,8 @@ extension LoginVC{
             switch response {
             case .success(let msg):
                 print("登入成功")
-                let jwt = msg.data.token
-                let role = msg.data.identity
+                let jwt = msg.data!.token
+                let role = msg.data!.identity
                 AuthManager.shared.setJwt(jwt)
                 AuthManager.shared.setRole(role)
                 // 可選：導向主頁

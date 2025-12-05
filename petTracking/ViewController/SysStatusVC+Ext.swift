@@ -73,7 +73,7 @@ extension SysStatusVC: MQTTManagerDelegate{
 
             switch response {
             case .success(let msg):
-                mqttStatusLabel.updateMQTTGoStatus(status: msg.data.mqtt_status)
+                mqttStatusLabel.updateMQTTGoStatus(status: msg.data!.mqtt_status)
             case .failure(let errorMsg):
                 // 自動彈出後端錯誤訊息！
                 showMessageAlert(title: "系統狀態查詢失敗", message: errorMsg.message)

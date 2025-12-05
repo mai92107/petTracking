@@ -22,17 +22,36 @@ class MQTTUtils{
     
     private init() {}  // 🔥 防止外部建立實例
     
-    func publishData(
-                     action: String,
-                     data: [String: Any],
-                     clientId: String,
-                     jwt: String,
-                     ip: String
-    ){
+    // MARK: 無需回覆，但須監聽錯誤
+    func publishAndGetErrorData(
+        action: String,
+        data: [String: Any],
+        clientId: String,
+        jwt: String,
+        ip: String
+    ) async -> MQTTResponse<CommonResponse<String>> {
+        
         let topic = "req/\(action)/\(clientId)/\(jwt)/\(ip)"
-        publishAndNoResponse(data: data, to: topic)
+        
+        return await withCheckedContinuation { continuation in
+            var finished = false
+            
+            publishAndNoResponse(data: data, to: topic) { reply in
+                guard !finished else { return }
+                finished = true
+                continuation.resume(returning: reply)
+            }
+            
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(MQTTConfig.timeout * 1_000_000_000))
+                guard !finished else { return }
+                finished = true
+                continuation.resume(returning: .timeout)
+            }
+        }
     }
     
+    // MARK: 需回覆
     func publishAndGetData<T: Decodable>(
         action: String,
         data: [String: Any],
@@ -44,36 +63,63 @@ class MQTTUtils{
         let topic = "req/\(action)/\(clientId)/\(jwt)/\(ip)"
         
         return await withCheckedContinuation { continuation in
-            var isCompleted = false
+            var finished = false
             
             publishAndWaitResponse(data: data, publishTopic: topic) { reply in
-                guard !isCompleted else { return }
-                isCompleted = true
+                guard !finished else { return }
+                finished = true
                 continuation.resume(returning: reply)
             }
             
-            // 超時處理
             Task {
                 try? await Task.sleep(nanoseconds: UInt64(MQTTConfig.timeout * 1_000_000_000))
-                guard !isCompleted else { return }
-                isCompleted = true
+                guard !finished else { return }
+                finished = true
                 continuation.resume(returning: .timeout)
             }
         }
     }
     
-    func publishAndNoResponse(data: [String:Any], to topic: String, qos: CocoaMQTTQoS = .qos1){
+    func publishAndNoResponse<T: Decodable>(
+        data: [String:Any],
+        to topic: String,
+        qos: CocoaMQTTQoS = .qos1,
+        completion: @escaping (MQTTResponse<T>) -> Void
+    ){
         guard let client = MQTTManager.shared.mqttClient, client.connState == .connected else {
             print("⚠️ MQTT 未連線,無法發送資料")
             return
         }
-        // 加入接收主題 及 錯誤訊息
-        let subscribeTopic = UUID().uuidString
-        var payload = data
-        payload["subscribeTo"] = subscribeTopic
         
-        // 轉為json string
-        if let jsonData = try? JSONSerialization.data(withJSONObject: payload, options: []),
+        // 1️⃣ 訂閱回覆主題, 增加錯誤回覆
+        let errTopic = "errReq/\(MQTTConfig.clientID)"
+        client.subscribe([(errTopic, qos: qos)])
+        print("📡 訂閱主題: \(errTopic)")
+            
+        // 2️⃣ 設定臨時 delegate 監聽回覆
+        let responseDelegate = MQTTResponseDelegate(
+                subscribeTopic: nil,
+                errTopic: errTopic
+        ) { result in
+
+            switch result {
+            case .failure(let errorMsg):
+                do {
+                    let decoded = try JSONDecoder().decode(T.self, from: Data(errorMsg.utf8))
+                    completion(.failure(decoded))
+                } catch {
+                    print("⚠️ 錯誤訊息不是 CommonResponse 格式: \(errorMsg)")
+                }
+            case .rawResponse(let jsonString):
+                completion(.rawResponse(jsonString))
+            default:
+                break
+            }
+        }
+        
+        MQTTManager.shared.addTemporaryDelegate(responseDelegate)
+
+        if let jsonData = try? JSONSerialization.data(withJSONObject: data, options: []),
            let jsonString = String(data: jsonData, encoding: .utf8) {
             // 3️⃣ 發佈訊息
             client.publish(topic, withString: jsonString, qos: qos)
@@ -94,7 +140,6 @@ class MQTTUtils{
           
           // 加入接收主題
           let subscribeTopic = UUID().uuidString
-          
           var payload = data
           payload["subscribeTo"] = subscribeTopic
           
@@ -106,8 +151,9 @@ class MQTTUtils{
           // 2️⃣ 設定臨時 delegate 監聽回覆
           let responseDelegate = MQTTResponseDelegate(
                   subscribeTopic: subscribeTopic,
-                  errTopic: errTopic) { result in
-              // 收到 String 後，再解析成 T
+                  errTopic: errTopic
+          ) { result in
+
               switch result {
               case .success(let jsonString):
                   do {
@@ -147,14 +193,16 @@ class MQTTUtils{
 
 /// 用於單次等待回覆的 delegate（含 timeout）
 class MQTTResponseDelegate: MQTTManagerDelegate {
-    private let subscribeTopic: String
+    
+    private let subscribeTopic: String?
     private let errTopic: String
     private let completion: (MQTTResponse<String>) -> Void
-    private var timeoutTask: DispatchWorkItem?
-    private var isCompleted = false
+    
+    private var finished = false
+    private var timeoutWork: DispatchWorkItem?
 
     init(
-        subscribeTopic: String,
+        subscribeTopic: String?,
         errTopic: String,
         timeout: TimeInterval = MQTTConfig.timeout,
         completion: @escaping (MQTTResponse<String>) -> Void
@@ -164,23 +212,15 @@ class MQTTResponseDelegate: MQTTManagerDelegate {
         self.completion = completion
 
         // 啟動 timeout 計時
-        timeoutTask = DispatchWorkItem { [weak self] in
-            guard let self = self, !self.isCompleted else { return }
-
-            self.isCompleted = true
-
-            // 取消訂閱與清理
-            if let client = MQTTManager.shared.mqttClient {
-                client.unsubscribe(self.subscribeTopic)
-                client.unsubscribe(self.errTopic)
-                print("🚫 已取消訂閱 (逾時): \(self.subscribeTopic)")
-            }
-
-            MQTTManager.shared.removeTemporaryDelegate(self)
+        timeoutWork = DispatchWorkItem { [weak self] in
+            guard let self = self, !self.finished else { return }
+            self.finished = true
+            self.completion(.timeout)
+            self.cleanup()
         }
 
         // 在背景 queue 排程 timeout
-        if let timeoutTask = timeoutTask {
+        if let timeoutTask = timeoutWork {
             DispatchQueue.global().asyncAfter(deadline: .now() + timeout, execute: timeoutTask)
         }
     }
@@ -191,17 +231,17 @@ class MQTTResponseDelegate: MQTTManagerDelegate {
 
     func mqttMsgGet(topic: String, message: String) {
         // 只處理指定主題
-        guard topic == subscribeTopic || topic == errTopic, !isCompleted else { return }
+        guard topic == subscribeTopic || topic == errTopic else { return }
+        guard !finished else { return }
 
-        isCompleted = true
-        timeoutTask?.cancel()
+        finished = true
+        timeoutWork?.cancel()
 
-        print("✅ 已收到回覆: \(message) ")
+        print("📩 收到 MQTT: [\(topic)] \(message)")
 
         if topic == subscribeTopic{
-            // 呼叫回呼
             completion(.success(message))
-        } else {
+        } else if topic == errTopic {
             completion(.failure(message))
         }
         completion(.rawResponse(message))
@@ -210,7 +250,8 @@ class MQTTResponseDelegate: MQTTManagerDelegate {
 
     private func cleanup() {
         if let client = MQTTManager.shared.mqttClient {
-            client.unsubscribe([subscribeTopic, errTopic])
+            if let s = subscribeTopic { client.unsubscribe(s) }
+            client.unsubscribe(errTopic)
         }
         MQTTManager.shared.removeTemporaryDelegate(self)
     }

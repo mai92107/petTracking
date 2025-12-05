@@ -17,15 +17,14 @@ enum Action: String {
     case SYSTEM_STATUS = "system_status"
     case ADD_DEVICE = "member_addDevice"
     case DEVICE_STATUS = "device_status"
-    case TRIP_HISTORY = "trips"
-    case TRIP_DETAIL = "trip"
-
+    case TRIP_HISTORY = "trip_list"
+    case TRIP_DETAIL = "trip_detail"
 }
 
 struct CommonResponse<T: Codable>: Decodable {
     let code: Int
     let message: String
-    let data: T
+    let data: T?
     let requestedTime: String?
     let respondedTime: String?
 }
@@ -42,12 +41,7 @@ struct EmptyResponse: Codable {}
 extension MQTTUtils{
     
     // 發布位置資料
-    func publishLocation(latitude: Double, longitude: Double, jwt: String, on newRecord: String) {
-        
-//        guard let deviceId = AuthManager.shared.getDeviceId() else {
-//            return
-//        }
-        
+    func publishLocation(latitude: Double, longitude: Double, jwt: String, on newRecord: String, isFinal: Bool) async -> MQTTResponse<CommonResponse<String>>{
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         formatter.timeZone = TimeZone.current
@@ -62,9 +56,21 @@ extension MQTTUtils{
         ]
         
         let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
-
-        // 發布到 topic
-        publishData(action: Action.RECORDING.rawValue, data: locationData, clientId: MQTTConfig.clientID, jwt: AuthManager.shared.getJWT()!, ip: ip)
+        return await isFinal ?
+        publishAndGetData(
+            action: Action.RECORDING.rawValue,
+            data: locationData,
+            clientId: MQTTConfig.clientID,
+            jwt: AuthManager.shared.getJWT()!,
+            ip: ip
+        ) :
+        publishAndGetErrorData(
+            action: Action.RECORDING.rawValue,
+            data: locationData,
+            clientId: MQTTConfig.clientID,
+            jwt: AuthManager.shared.getJWT()!,
+            ip: ip
+        )
     }
     
     struct RegisterData: Codable {
@@ -83,11 +89,13 @@ extension MQTTUtils{
             "nickName": nickname,
         ]
         let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
-        return await publishAndGetData(action: Action.REGISTER.rawValue,
-                                          data: data,
-                                          clientId: MQTTConfig.clientID,
-                                          jwt: "",
-                                          ip: ip)
+        return await publishAndGetData(
+            action: Action.REGISTER.rawValue,
+            data: data,
+            clientId: MQTTConfig.clientID,
+            jwt: "",
+            ip: ip
+        )
     }
     
     struct LoginData: Codable {
@@ -140,8 +148,8 @@ extension MQTTUtils{
                                        ip: ip)
     }
     
-
-
+    
+    
     struct TripHistories: Codable{
         let pageInfo: PageInfo
         let trips: [TripModel]
@@ -161,4 +169,18 @@ extension MQTTUtils{
                                        clientId: MQTTConfig.clientID,
                                        jwt: AuthManager.shared.getJWT()!,
                                        ip: ip)
-    }}
+    }
+      
+    func publishTripDetail(deviceId: String, uuid: String) async -> MQTTResponse<CommonResponse<TripDetail>>{
+        let data: [String: Any] = [
+            "deviceId": deviceId,
+            "tripUuid":uuid
+        ]
+        let ip: String = NetworkUtils.getIPAddress() ?? "0:0:0:0"
+        return await publishAndGetData(action: Action.TRIP_DETAIL.rawValue,
+                                       data: data,
+                                       clientId: MQTTConfig.clientID,
+                                       jwt: AuthManager.shared.getJWT()!,
+                                       ip: ip)
+    }
+}

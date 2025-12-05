@@ -116,8 +116,7 @@ extension RegisterVC: PtButtonDelegate{
                                                                    nickname: nickname!)
             switch response {
             case .success(let msg):
-                print("註冊成功: \(msg.data)")
-                let jwt = msg.data.token
+                let jwt = msg.data!.token
                 AuthManager.shared.setJwt(jwt)
 
             case .failure(let errorMsg):

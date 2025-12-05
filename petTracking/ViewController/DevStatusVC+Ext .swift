@@ -73,8 +73,8 @@ extension DevStatusVC: MQTTManagerDelegate{
 
             switch response {
             case .success(let msg):
-                statusInfoLabel.updateLastSeenLabel(time: msg.data.lastSeen)
-                statusInfoLabel.updateStatus(online: msg.data.online)
+                statusInfoLabel.updateLastSeenLabel(time: msg.data!.lastSeen)
+                statusInfoLabel.updateStatus(online: msg.data!.online)
             case .failure(let errorMsg):
                 // 自動彈出後端錯誤訊息！
                 showMessageAlert(title: "裝置狀態查詢失敗", message: errorMsg.message)

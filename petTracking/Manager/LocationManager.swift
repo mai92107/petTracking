@@ -50,7 +50,7 @@ class LocationManager: NSObject {
     }
     
     // MARK: - Authorization
-    func requestAuthorizationAndStart() {
+    func requestAuthorizationAndStart() { // 改成doOnSuccess() 執行同意後的動作 // 移到權限中心 統一取得必要權限
         switch locationManager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
             startUpdatingLocation()
@@ -73,7 +73,8 @@ class LocationManager: NSObject {
         guard !isTracking else { return }
         isTracking = true
         newRecordRef = UUID().uuidString
-        
+        print("開始startUpdatingLocation")
+
         lastSentTime = nil
         lastSentLocation = nil
         

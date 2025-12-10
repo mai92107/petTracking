@@ -108,7 +108,7 @@ final class TrackingVC: BaseVC {
 // MARK: - Tracking Control
 extension TrackingVC: PtButtonDelegate{
     func onClick(_ sender: PTButton) {
-        print(!isTracking ? "🔄 停止追蹤" : "🔄 開始追蹤")
+        print(isTracking ? "🔄 停止追蹤" : "🔄 開始追蹤")
 
         isTracking ? stopTracking() : startTracking()
     }
@@ -125,9 +125,12 @@ extension TrackingVC: LocationManagerDelegate {
     private func updateLocationDisplay(latitude: Double, longitude: Double) {
         locationLabel.updateLatitude(abs(latitude))
         locationLabel.updateLongitude(abs(longitude))
+        print("開始updateLocationDisplay")
+
         let coord = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         let region = MKCoordinateRegion(center: coord, latitudinalMeters: 500, longitudinalMeters: 500)
         mapView.setRegion(region, animated: true)
+        print("開始mapView")
     }
     
     private func sendLocationData(latitude: Double, longitude: Double) {
@@ -179,16 +182,16 @@ extension TrackingVC{
             showFailedMessageAlert(message: "非核可裝置，不可紀錄位置")
             return
         }
-        
+        print("開始startTracking1")
         LocationManager.shared.requestAuthorizationAndStart()
         isTracking = true
-        
+        print("開始startTracking2")
         actionButton.setTitle("停止定位", for: .normal)
     }
     
     private func stopTracking() {
-        guard let jwt = AuthManager.shared.getJWT() else { return }
-        guard let dataRef = LocationManager.shared.newRecordRef else { return }
+//        guard let jwt = AuthManager.shared.getJWT() else { return }
+//        guard let dataRef = LocationManager.shared.newRecordRef else { return }
 //        sendFinalData(jwt: jwt, on: dataRef)
         resetTracker()
     }
@@ -258,7 +261,7 @@ extension TrackingVC{
     }
 }
 
-#Preview {
-    TrackingVC()
-}
-
+//#Preview {
+//    TrackingVC()
+//}
+//

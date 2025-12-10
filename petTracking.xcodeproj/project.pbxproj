@@ -12,6 +12,7 @@
 		58B7C3E52ECF08690094468A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B7C3E42ECF08680094468A /* WidgetKit.framework */; };
 		58B7C3E72ECF08690094468A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B7C3E62ECF08690094468A /* SwiftUI.framework */; };
 		58B7C3F82ECF086A0094468A /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 58B7C3E32ECF08680094468A /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A0B0CB4A2EE9576F00E8087A /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0B0CB492EE9576F00E8087A /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		58B7C3E42ECF08680094468A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		58B7C3E62ECF08690094468A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		5A023DAE0C071298F518ABF6 /* Pods_petTracking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_petTracking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0B0CB492EE9576F00E8087A /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		BD995E18CF9F3E9E11A5D829 /* Pods-petTracking.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-petTracking.release.xcconfig"; path = "Target Support Files/Pods-petTracking/Pods-petTracking.release.xcconfig"; sourceTree = "<group>"; };
 		E19749207ADDF9ABA8AA0BC7 /* Pods-petTracking.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-petTracking.debug.xcconfig"; path = "Target Support Files/Pods-petTracking/Pods-petTracking.debug.xcconfig"; sourceTree = "<group>"; };
 		E1F8D2472EA907FA008CE84F /* petTracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = petTracking.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -107,6 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0B0CB4A2EE9576F00E8087A /* MapKit.framework in Frameworks */,
 				4E1B885247C38F26A5AAA672 /* Pods_petTracking.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -117,6 +120,7 @@
 		329A3D5D2EF19063FEF447F7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A0B0CB492EE9576F00E8087A /* MapKit.framework */,
 				5A023DAE0C071298F518ABF6 /* Pods_petTracking.framework */,
 				58B7C3E42ECF08680094468A /* WidgetKit.framework */,
 				58B7C3E62ECF08690094468A /* SwiftUI.framework */,

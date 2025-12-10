@@ -34,8 +34,7 @@ final class DevStatusVC: BaseVC {
     
     // MARK: - Layout
     private func setupUI() {
-        view.backgroundColor = .ptQuaternary
-        
+        view.backgroundColor = .backgroundColor
         view.addSubview(titleLabel)
         view.addSubview(statusInfoLabel)
         

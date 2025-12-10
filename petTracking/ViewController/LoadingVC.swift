@@ -21,7 +21,7 @@ class LoadingViewController: BaseVC {
     }
 
     private func setupProgressView() {
-        view.backgroundColor = .ptQuaternary
+        view.backgroundColor = .backgroundColor
         progressView.frame = CGRect(x: 40, y: view.frame.height * 2/3, width: view.frame.width - 80, height: 20)
         
         progressView.progress = 0.0
@@ -46,10 +46,16 @@ class LoadingViewController: BaseVC {
 
     func showMainViewController() {
         if !AuthManager.shared.isLoggedIn() {
-            SceneNavigator.shared.switchToUnAuth()
+            SceneNavigator.shared.switchToAuth()
+
+//            SceneNavigator.shared.switchToUnAuth()
         } else {
             SceneNavigator.shared.switchToAuth()
             print(AuthManager.shared.getJWT()!)
         }
     }
 }
+//
+//#Preview {
+//    LoadingViewController()
+//}

@@ -35,7 +35,7 @@ final class SysStatusVC: BaseVC {
     
     // MARK: - Layout
     private func setupUI() {
-        view.backgroundColor = .ptQuaternary
+        view.backgroundColor = .backgroundColor
         
         view.addSubview(titleLabel)
         view.addSubview(mqttStatusLabel)

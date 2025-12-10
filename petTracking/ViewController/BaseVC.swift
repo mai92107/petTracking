@@ -30,7 +30,7 @@ class BaseVC: UIViewController {
     
     
     func startCron(){
-        Cron.shared.start()
+//        Cron.shared.start()
     }
     
 }

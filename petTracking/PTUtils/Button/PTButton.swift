@@ -15,12 +15,12 @@ class PTButton: UIButton {
     
     weak var ptDelegate: PtButtonDelegate?
 
-    init(title: String, Vpadding: CGFloat, Hpadding: CGFloat) {
+    init(title: String, Vpadding: CGFloat, Hpadding: CGFloat, bgColor: UIColor = .ptPrimary, textColor: UIColor = .ptQuinary) {
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false
-        
-        let bgColor: UIColor = .ptPrimary
-        let textColor: UIColor = .ptQuinary
+
+//        let bgColor: UIColor = .ptPrimary
+//        let textColor: UIColor = .ptQuinary
         
         let pdTop: CGFloat = Vpadding
         let pdLeft: CGFloat = Hpadding

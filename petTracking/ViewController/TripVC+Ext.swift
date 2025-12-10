@@ -37,7 +37,7 @@ final class TripVC: BaseVC {
         setupUI()
         
         // 取得資料
-        getTripHistory()
+//        getTripHistory()
     }
 
     // MARK: - Config
@@ -47,7 +47,7 @@ final class TripVC: BaseVC {
     
     // MARK: - Layout
     private func setupUI() {
-        view.backgroundColor = .ptQuaternary
+        view.backgroundColor = .backgroundColor
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         tripCollection.translatesAutoresizingMaskIntoConstraints = false

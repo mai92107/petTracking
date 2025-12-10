@@ -8,13 +8,23 @@
 import UIKit
 import CoreLocation
 import ActivityKit
+import MapKit
+import SwiftUI
 
 final class TrackingVC: BaseVC {
     
     // MARK: - UI Components
     private let titleLabel = PTLabel(text: "Pet Tracking System", with: .title)
-    private let actionButton = PTButton(title: "開始定位", Vpadding: 15, Hpadding: 40)
+    private let actionButton = PTButton(title: "開始定位", Vpadding: 15, Hpadding: 40, bgColor: .btColor, textColor: .lColor)
     private let locationLabel = LocationView()
+    
+    private let mapView: MKMapView = {
+        let map = MKMapView()
+        map.translatesAutoresizingMaskIntoConstraints = false
+        map.layer.cornerRadius = 20
+        map.clipsToBounds = true
+        return map
+    }()
     
     private var timer: Timer?
     private var seconds = 0
@@ -48,9 +58,10 @@ final class TrackingVC: BaseVC {
     
     // MARK: - Layout
     private func setupUI() {
-        view.backgroundColor = .ptQuaternary
+        view.backgroundColor = .backgroundColor
         
         view.addSubview(titleLabel)
+        view.addSubview(mapView)
         view.addSubview(locationLabel)
         view.addSubview(actionButton)
         
@@ -60,13 +71,18 @@ final class TrackingVC: BaseVC {
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: padding),
             
+            mapView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            mapView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            mapView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.85),
+            mapView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4),
+            
             actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -padding),
-
+            
             locationLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             locationLabel.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -padding),
             locationLabel.heightAnchor.constraint(equalToConstant: 100)
-
+            
         ])
     }
     
@@ -77,6 +93,10 @@ final class TrackingVC: BaseVC {
             if let last = LocationManager.shared.lastKnownLocation {
                 locationLabel.updateLatitude(abs(last.coordinate.latitude))
                 locationLabel.updateLongitude(abs(last.coordinate.longitude))
+                let region = MKCoordinateRegion(center: last.coordinate,
+                                                latitudinalMeters: 500,
+                                                longitudinalMeters: 500)
+                mapView.setRegion(region, animated: true)
             }
         } else {
             actionButton.setTitle("開始定位", for: .normal)
@@ -88,6 +108,8 @@ final class TrackingVC: BaseVC {
 // MARK: - Tracking Control
 extension TrackingVC: PtButtonDelegate{
     func onClick(_ sender: PTButton) {
+        print(!isTracking ? "🔄 停止追蹤" : "🔄 開始追蹤")
+
         isTracking ? stopTracking() : startTracking()
     }
 }
@@ -96,13 +118,16 @@ extension TrackingVC: PtButtonDelegate{
 extension TrackingVC: LocationManagerDelegate {
     func didUpdateLocation(lng: Double, lat: Double) {
         print("📍 定位更新 - 緯度:\(lat), 經度:\(lng)")
-        sendLocationData(latitude: lat, longitude: lng)
+//        sendLocationData(latitude: lat, longitude: lng)
         updateLocationDisplay(latitude: lat, longitude: lng)
     }
     
     private func updateLocationDisplay(latitude: Double, longitude: Double) {
         locationLabel.updateLatitude(abs(latitude))
         locationLabel.updateLongitude(abs(longitude))
+        let coord = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let region = MKCoordinateRegion(center: coord, latitudinalMeters: 500, longitudinalMeters: 500)
+        mapView.setRegion(region, animated: true)
     }
     
     private func sendLocationData(latitude: Double, longitude: Double) {
@@ -146,10 +171,10 @@ extension TrackingVC: LocationManagerDelegate {
 
 extension TrackingVC{
     private func startTracking() {
-        if !MQTTManager.shared.isConnect {
-            showFailedMessageAlert(message: "MQTT 未連線，訊息無法送出\n請稍後嘗試")
-            return
-        }
+//        if !MQTTManager.shared.isConnect {
+//            showFailedMessageAlert(message: "MQTT 未連線，訊息無法送出\n請稍後嘗試")
+//            return
+//        }
         if DeviceConfig.deviceId == "" {
             showFailedMessageAlert(message: "非核可裝置，不可紀錄位置")
             return
@@ -164,7 +189,7 @@ extension TrackingVC{
     private func stopTracking() {
         guard let jwt = AuthManager.shared.getJWT() else { return }
         guard let dataRef = LocationManager.shared.newRecordRef else { return }
-        sendFinalData(jwt: jwt, on: dataRef)
+//        sendFinalData(jwt: jwt, on: dataRef)
         resetTracker()
     }
     private func resetTracker(){
@@ -232,3 +257,8 @@ extension TrackingVC{
         }
     }
 }
+
+#Preview {
+    TrackingVC()
+}
+
